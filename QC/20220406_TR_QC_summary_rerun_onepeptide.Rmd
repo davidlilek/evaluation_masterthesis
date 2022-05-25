@@ -1,0 +1,210 @@
+---
+title: "DataAnalysis - Postprocessing Results MaxQuant"
+autor: David Lilek
+date: "`r format(Sys.time(), '%d %B %Y, %X')`"
+output:
+  html_document:
+    df_print: paged
+    fig.align: center
+    self_contained: yes
+    fig.height: 4
+    fig.width: 8
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    number_sections: yes
+    code_folding: hide
+---
+
+```{r start, message=FALSE, warning=FALSE, include=FALSE}
+start_time = format(Sys.time(), '%X')
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+#load libraries
+library(tidyverse)
+library(dplyr)
+library(gplots)
+library(reshape2) #for melting data for boxplot with ggplot
+library(pheatmap)
+library(MASS)
+library(ggpubr)
+```
+
+```{r results="asis"}
+###############################
+#
+#define settings
+#
+###############################
+
+path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/QC/tmpfiles/qc_oneuniquepeptide/"
+
+##########read in all data with pattern .txt
+# get file list
+file.list <- list.files(path = path, pattern='*.csv')
+# create file path
+file.path <- paste(path,file.list,sep = "")
+# read in files - for each file one variable is created - results are stored in a list
+res_raw <- lapply(file.path, function(i){read.csv2(i, row.names = 1)})
+names(res_raw) <- file.list
+```
+
+```{r}
+#create data.frame
+res<-as.data.frame(res_raw)
+rownames(res) <- NULL
+```
+
+```{r}
+#functions
+CV <- function(x){
+  (sd(x)/mean(x))*100
+}
+
+MEAN <- function(x){
+  mean(x)
+}
+
+SD <- function(x){
+  sd(x)
+}
+```
+
+# Razor
+
+```{r}
+razor <- res[,grep("Razor",colnames(res))]
+colnames(razor) <- c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR")
+boxplot(razor)
+apply(razor,2,CV)
+```
+
+# Unique
+
+```{r}
+unique <- res[,grep("Unique",colnames(res))]
+colnames(unique) <- c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR")
+boxplot(unique)
+apply(unique,2,CV)
+```
+
+# LFQ
+
+```{r}
+lfq <- res[,grep("LFQ",colnames(res))]
+colnames(lfq) <- c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR")
+boxplot(lfq)
+apply(lfq,2,CV)
+```
+
+# visualize no protein identifications
+
+```{r}
+#plot data
+no <- c(apply(razor,2,MEAN),apply(unique,2,MEAN),apply(lfq,2,MEAN))
+sd <- c(apply(razor,2,SD),apply(unique,2,SD),apply(lfq,2,SD))
+evaluation <- rep(c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"),3)
+
+type <- c("Razor","Unique","LFQ")
+type <- rep(type, each=6)
+
+df <- data.frame(no, type, evaluation,sd)
+colnames(df) <- c("no","Type","Evaluation","sd")
+
+#reorder x axis
+df$Type <- factor(df$Type,
+                  levels = c("Razor","Unique","LFQ"))
+df$Evaluation <- factor(df$Evaluation,
+                               levels = c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"))
+
+
+p_plot_one <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
+    geom_bar(stat='identity', position=position_dodge()) +
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("No. of protein identifications") +
+  labs(fill = "Evaluation \n method") +
+  coord_cartesian(ylim=c(1200,2000))
+p_plot_one
+```
+
+* type of Razor peptides: `r df$Evaluation[df$Type=="Razor"]`
+* mean of Razor peptides: `r df$no[df$Type=="Razor"]`
+* type of unique peptides: `r df$Evaluation[df$Type=="Unique"]`
+* mean of unique peptides: `r df$no[df$Type=="Unique"]`
+* type of lfq peptides: `r df$Evaluation[df$Type=="LFQ"]`
+* mean of lfq peptides: `r df$no[df$Type=="LFQ"]`
+
+Using at least one razor&unique resp unique peptide as treshhold for the data analysis it can be seen that the number of protein identifications is quite similar for type Razor and Unique independet which evaluation method is used. For LFQ it heavily dependet on the used evaluation method. 
+Taking a closer look it can be seen that be seen that for Razor and Unique app. 8 more proteins could be found with the newer version of MaxQuant (evaluation method MBR_pooled resp noMBR_pooled). For LFQ the difference between new and old version is 34 which is significantly higher than using type Razor or Unique. 
+Pooling the samples after protein identification/quantification manually (MBR resp no_MBR) leads to a lower number of protein identifications (5 for MBR, 10 for no_MBR using Razor or Unique). For LFQ manually pooling leads to a significant decrease of 30 for MBR and 760(!) for no_MBR. As already mentioned in the introduction, this was expected since the quantification also depends on proteins from the same experiment.
+Except for LFQ MBR resp no_MBR the evaluation method MBR didn't increase or decrease the number of protein idenitification significantly. 
+
+# visualize rsd
+
+```{r}
+#plot data
+rsd <- c(apply(razor,2,CV),apply(unique,2,CV),apply(lfq,2,CV))
+
+evaluation <- rep(c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"),3)
+
+type <- c("Razor","Unique","LFQ")
+type <- rep(type, each=6)
+
+df <- data.frame(no, rsd, type, evaluation)
+colnames(df) <- c("no","rsd","Type","Evaluation")
+
+#reorder x axis
+df$Type <- factor(df$Type,
+                  levels = c("Razor","Unique","LFQ"))
+df$Evaluation <- factor(df$Evaluation,
+                               levels = c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"))
+
+rsd_plot_one <- ggplot(df, aes(x=Type, y=rsd, fill=Evaluation)) +
+    geom_bar(stat='identity', position='dodge') +
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("relative sd [%]") +
+  labs(fill = "Evaluation \n method")
+rsd_plot_one
+```
+
+The relative standard deviation (rsd) is independet of the used type quite similar for all evulation methods except, also as before, MBR type LFQ and no_MBR type LFQ.
+The lowest rsd for type Razor and Unique could be achieved for evaluation method MBR where the samples were pooled manually followed MBR_pooled where the samples were pooled during the protein idenfication/quantification.
+Comparing old and new version in terms of the rsd it is obvious that the rsd is more than twice as high for type Razor, Unique and LFQ evaluation method MBR_pooled and a third higher for type Unique resp Unique evaluation method noMBR_pooled and at least still a quater higher for type LFQ evaluation method no_MBR.
+
+CONCLUSION
+
+In summary it can be said, that using the old version leads to less protein identifications with a higher relative standard deviation. Manually pooling leads to similiar results than pooling during the protein/identification except for type LFQ. The influence of MBR is generally marginal.
+
+```{r}
+saveRDS(df, file = "20220406_TR_QC_summary_rerun_onepeptide.rds")
+```
+
+# LaTeX
+
+```{r}
+
+```
+
+# Used time
+
+```{r end, message=FALSE, warning=FALSE, include=FALSE}
+end_time = format(Sys.time(), '%X')
+```
+
+```{r used time, echo=FALSE, message=TRUE, warning=FALSE}
+print(paste("Time used for analysis:", round(as.difftime(end_time, units = "mins")-as.difftime(start_time, units = "mins"),digits=2),"minutes"))
+```
