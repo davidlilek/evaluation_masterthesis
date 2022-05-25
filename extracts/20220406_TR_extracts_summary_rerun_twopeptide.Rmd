@@ -45,7 +45,7 @@ library(kableExtra)
 #
 ###############################
 
-path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/tmpfiles/extracts_twouniquepeptide/"
+path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/extracts/tmpfiles/extracts_twouniquepeptide/"
 
 ##########read in all data with pattern .txt
 # get file list
@@ -78,7 +78,7 @@ MEAN <- function(x){
 ```{r}
 #set sample name
 sample_names <- c("_A","_B","_C","_D","_E","_F")
-col_names <- c("MBR_pooled","noMBR_pooled","noMBR")
+col_names <- c("MBR_pooled","noMBR_pooled","noMBR","test","testB")
 #c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR")
 ```
 
@@ -114,7 +114,7 @@ for (sample_name in sample_names){
   
   evaluation <- rep(col_names,3)
   type <- c("Razor","Unique","LFQ")
-  type <- rep(type, each=3)
+  type <- rep(type, each=length(file.list))
   
   df <- data.frame(no, rsd, type, evaluation)
   colnames(df) <- c("no","rsd","Type","Evaluation")
