@@ -209,6 +209,11 @@ for (grd in 1:nrow(grid)){
   # remove all rows which only contain NA values
   result.clear <- result[rowSums(is.na(result[,-1])) != ncol(result[,-1]), ]
   
+  # p value adjustment
+  p <- result.clear$pvalue
+  result.clear$pvalue <- p.adjust(p, method = "BY", n = length(p))
+
+  
   # set all NaN values to 0
   result.clear$mean_A[is.nan(result.clear$mean_A)] <- 0
   result.clear$mean_B[is.nan(result.clear$mean_B)] <- 0
@@ -273,7 +278,7 @@ for (grd in 1:nrow(grid)){
 ggarrange(plotlist = plots, nrow = 3, ncol = 2,
                    labels = LETTERS[1:6],
           common.legend = TRUE, legend = "bottom")
-ggsave("volcanoplots.png", width = 7, height = 7)
+ggsave("../pics/volcanoplots.png", width = 7, height = 7)
 
 #########################################
 # create stacked barplot for comparisons
@@ -287,10 +292,8 @@ i = 0
 # loop over all comparisons and 
 for (i in 1:6){
   tmp <- as.data.frame(table(res_comparison[[i]]$group))
-  # take column 2 with the results
-  tmp <- tmp[,-1]
   # remove number 6 -> NA
-  res_plot <- c(res_pltypeot, tmp[-6])
+  res_plot <- c(res_plot, tmp[-6,2])
 }
 
 # get names for data.frame
