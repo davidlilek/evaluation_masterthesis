@@ -111,7 +111,7 @@ for (sample_name in sample_names){
   rsd <- c(apply(razor,2,CV),apply(unique,2,CV),apply(lfq,2,CV))
   rsd <- round(rsd,3)
   
-  evaluation <- rep(col_names,6)
+  evaluation <- rep(col_names,3)
   type <- c("Razor","Unique","LFQ")
   type <- rep(type, each=length(file.list))
   
@@ -126,7 +126,7 @@ for (sample_name in sample_names){
   df$Type <- factor(df$Type,
                     levels = c("Razor","Unique","LFQ"))
   df$Evaluation <- factor(df$Evaluation,
-                                 levels = c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"))
+                                 levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
   p_plot_two <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
       geom_bar(stat='identity', position='dodge') +
     theme_minimal() +

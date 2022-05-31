@@ -9,6 +9,10 @@
 
 library(ggpubr)
 
+plots_no_twopeptides <- readRDS("plots_no_twopeptides.rds")
+plots_rsd_twopeptides <- readRDS("plots_rsd_twopeptides.rds")
+plots_no_onepeptide <- readRDS("plots_no_onepeptide.rds")
+plots_rsd_onepeptide <- readRDS("plots_rsd_onepeptide.rds")
 sample_names <- c("_A","_B","_C","_D","_E","_F")
 
 for (sample_name in sample_names){
