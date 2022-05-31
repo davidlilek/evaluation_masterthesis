@@ -62,7 +62,7 @@ Filtering:
 
 The txt-files were read in, processed and filtered automatically. This section shows the code, several plots and also some summary statistics which are only shown for further discussion on the results, for the documentation of the statistical evaluation and are not labeled/discussed yet. If you are interested in the summary of the results go to `Summary`.
 
-```{r include=FALSE, results="asis"}
+```{r, results="asis"}
 ###############################
 #
 #define settings
@@ -71,13 +71,13 @@ The txt-files were read in, processed and filtered automatically. This section s
 
 GET_SAMPLE_NAMES <- TRUE # if set to false define it in the next line
 # sample_names_raw <- c("A1","A2","A3")
-unique <- 2  #how many peptides should be necessary to identify a protein
+unique <- 1  #how many peptides should be necessary to identify a protein
 
 RAZOR <- TRUE #TRUE | FALSE
 UNIQUE <- TRUE #TRUE | FALSE
 LFQ <- TRUE #TRUE | FALSE
 
-path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/3_20220406_TR/20220406_TR_QC_MBR_rerun_4masterthesis/"
+path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/3_20220406_TR/20220406_TR_extracts_noMBR_pooled_rerun_oldversion_4masterthesis/"
 #path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/R/"
 
 # load functions
@@ -220,7 +220,9 @@ if (LFQ == TRUE) {
     results_lfq[[x]] <- results
     #assign(paste("results_lfq",x,sep="_"),results) #create individual variable names
     
-   
+
+
+    
     results_2gether_lfq[x,] <-    sapply(results,function(x)sum(!is.na(x)))
     cat("\n")
     
@@ -250,56 +252,9 @@ rm(data,
 end_time = format(Sys.time(), '%X')
 ```
 
-
-
-```{r used time, echo=FALSE, message=TRUE, warning=FALSE}
-print(paste("Time used for analysis:", round(as.difftime(end_time, units = "mins")-as.difftime(start_time, units = "mins"),digits=2),"minutes"))
-```
-
-# Pool the data
-
-## Razor
-
 ```{r}
-i = 0
-res_pool_razor <- c()
-for (i in 1:length(sample_names_raw)){
-  tmp <- apply(results_razor[[i]], 1, any)
-  res_pool_razor <- c(res_pool_razor, length(tmp[tmp == TRUE]))
-}
+res <- data.frame(cbind(results_2gether_razor[,-7],results_2gether_unique[,-7],results_2gether_lfq[,-7]))
+colnames(res) <- paste(rep(c("Razor_", "Unique_", "LFQ_"),each = 6),rep(LETTERS[1:6],1),sep="")
+write.csv2(res, file = "./tmpfiles/20220406_TR_extracts_noMBR_pooled_rerun_oldversion.csv")
 ```
 
-
-## Unique 
-
-```{r}
-i = 0
-res_pool_unique <- c()
-for (i in 1:length(sample_names_raw)){
-  tmp <- apply(results_unique[[i]], 1, any)
-  res_pool_unique <- c(res_pool_unique, length(tmp[tmp == TRUE]))
-}
-```
-
-## LFQ
-
-```{r}
-i = 0
-res_pool_lfq <- c()
-
-for (i in 1:length(sample_names_raw)){
-    tmp <- results_lfq[[i]][rowSums(is.na(results_lfq[[i]])) != ncol(results_lfq[[i]]), ]
-  res_pool_lfq <- c(res_pool_lfq, nrow(tmp))
-}
-```
-  
-  
-
-
-## save to file
-
-```{r}
-res <- data.frame(cbind(res_pool_razor,res_pool_unique,res_pool_lfq))
-colnames(res) <- c("Razor", "Unique", "LFQ")
-write.csv2(res, file = "./tmpfiles/20220406_TR_QC_MBR_rerun.csv")
-```

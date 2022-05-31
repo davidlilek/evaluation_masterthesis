@@ -45,7 +45,7 @@ library(kableExtra)
 #
 ###############################
 
-path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/extracts/tmpfiles/extracts_twouniquepeptide/"
+path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/extracts/tmpfiles/extracts_oneuniquepeptide/"
 
 ##########read in all data with pattern .txt
 # get file list
@@ -83,8 +83,8 @@ col_names <- c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR
 
 
 ```{r, results="asis"}
-plots_no_twopeptides <- list()
-plots_rsd_twopeptides <- list()
+plots_no_onepeptide <- list()
+plots_rsd_onepeptide <- list()
 for (sample_name in sample_names){
   cat("\n")
   cat("#",sample_name,"\n")
@@ -111,7 +111,7 @@ for (sample_name in sample_names){
   rsd <- c(apply(razor,2,CV),apply(unique,2,CV),apply(lfq,2,CV))
   rsd <- round(rsd,3)
   
-  evaluation <- rep(col_names,3)
+  evaluation <- rep(col_names,6)
   type <- c("Razor","Unique","LFQ")
   type <- rep(type, each=length(file.list))
   
@@ -155,17 +155,20 @@ for (sample_name in sample_names){
     print(rsd_plot_two)
     cat("\n")
     
-    plots_no_twopeptides[[sample_name]] <- p_plot_two
-    plots_rsd_twopeptides[[sample_name]] <- rsd_plot_two
+    plots_no_onepeptide[[sample_name]] <- p_plot_two
+    plots_rsd_onepeptide[[sample_name]] <- rsd_plot_two
     
 }
 ```
 
+
 ```{r}
-saveRDS(plots_no_twopeptides, file = "plots_no_twopeptides.rds")
-saveRDS(plots_rsd_twopeptides, file = "plots_rsd_twopeptides.rds")
-saveRDS(df, file = "results_twopeptides.rds")
+saveRDS(plots_no_onepeptide, file = "plots_no_onepeptide.rds")
+saveRDS(plots_rsd_onepeptide, file = "plots_rsd_onepeptide.rds")
+saveRDS(df, file = "results_onepeptide.rds")
 ```
+
+
 
 ```{r eval=FALSE, include=FALSE}
 df_onepeptide <- readRDS("20220406_TR_QC_summary_rerun_onepeptide.rds")
