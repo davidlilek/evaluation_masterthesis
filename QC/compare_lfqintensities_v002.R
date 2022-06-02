@@ -308,8 +308,7 @@ colnames(res_plot_group) <- c("Group", "Comparison", "counts")
 res_plot_group$counts <- as.double(res_plot_group$counts)
 # create stacked barplot
 b_plot <- ggplot(res_plot_group, aes(fill = Group, y = counts, x=Comparison, label = counts)) +
-  geom_bar( position = "stack",stat="identity") + 
-  geom_text(size = 2, position = position_stack(vjust = 0.5))
+  geom_bar( position = "stack",stat="identity") # +  geom_text(size = 2, position = position_stack(vjust = 0.5))
 b_plot
 ggsave("../pics/barplot_lfqintensities.png",
        width = 7,

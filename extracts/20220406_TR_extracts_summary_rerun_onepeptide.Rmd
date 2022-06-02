@@ -136,7 +136,7 @@ for (sample_name in sample_names){
     guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
     ylab("No. of protein identifications") +
     labs(fill = "Evaluation \n method") +
-    coord_cartesian(ylim=c(300,900))
+    coord_cartesian(ylim=c(200,1200))
     # scale_y_break(c(100,1200)) with library(ggbreak)
     print(p_plot_two)
     
