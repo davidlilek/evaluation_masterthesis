@@ -1,0 +1,368 @@
+---
+title: "DataAnalysis - Postprocessing Results MaxQuant"
+autor: David Lilek
+date: "`r format(Sys.time(), '%d %B %Y, %X')`"
+output:
+  html_document:
+    df_print: paged
+    fig.align: center
+    self_contained: yes
+    fig.height: 4
+    fig.width: 8
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    number_sections: yes
+    code_folding: hide
+---
+
+```{r start, message=FALSE, warning=FALSE, include=FALSE}
+start_time = format(Sys.time(), '%X')
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+#load libraries
+library(tidyverse)
+library(dplyr)
+library(gplots)
+library(reshape2) #for melting data for boxplot with ggplot
+library(pheatmap)
+```
+
+# Introduction
+
+## LFQ-Procedure
+
+Filtering:
+
+-   `Potential.contaminant == ""` -> remove where contaminants
+-   `Reverse == ""`-> remove where reverse = +
+-   `Only.identified.by.site == ""` -> remove where only identified by site = +
+
+Then the `log2`of the LFQ intensities was calculated and all `-Inf` values were substituted by NA using the following command: `lfq[lfq == -Inf] <- NA`
+
+Then the number of lfq values was used for the further evaluation, visualization and statistical testing. In the following this data will be called LFQ.
+
+## Unique | Razor&Unique procedure
+
+Filtering:
+
+-   `Potential.contaminant == ""` -> remove where contaminants
+-   `Reverse == ""`-> remove where reverse = +
+-   `Only.identified.by.site == ""` -> remove where only identified by site = +
+
+-   `data[name] >= unique` -> keep only identifications which have greater or equal number (defined via variable `unique`) of `razor/unique peptides ` | in this case `unique`was set to 2.
+
+# Data Analysis
+
+The txt-files were read in, processed and filtered automatically. This section shows the code, several plots and also some summary statistics which are only shown for further discussion on the results, for the documentation of the statistical evaluation and are not labeled/discussed yet. If you are interested in the summary of the results go to `Summary`.
+
+```{r include=FALSE, results="asis"}
+###############################
+#
+#define settings
+#
+###############################
+
+GET_SAMPLE_NAMES <- TRUE # if set to false define it in the next line
+# sample_names_raw <- c("A1","A2","A3")
+unique <- 2  #how many peptides should be necessary to identify a protein
+
+RAZOR <- TRUE #TRUE | FALSE
+UNIQUE <- TRUE #TRUE | FALSE
+LFQ <- TRUE #TRUE | FALSE
+
+path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/2_UPS1/UPS1_MBR_rerun_4masterthesis/"
+
+# load functions
+filtering <- function(data_raw){
+  data_raw %>% filter( 
+    Potential.contaminant == "",
+    Reverse == "",
+    Only.identified.by.site == "")
+}
+
+CV <- function(x){
+  (sd(x)/mean(x))*100
+}
+
+##########read in all data with pattern .txt
+# get file list
+file.list <- list.files(path = path, pattern='*.txt')
+# create file path
+file.path <- paste(path,file.list,sep = "")
+# read in files - for each file one variable is created - results are stored in a list
+res_raw <- lapply(file.path, read.delim)
+names(res_raw) <- file.list
+
+#get sample names
+if (GET_SAMPLE_NAMES == TRUE){
+    tmp <- colnames(res_raw[[1]])
+    tmp <- tmp[grep("Razor...unique.peptides.",tmp)]
+    tmp <- sub(".*Razor...unique.peptides.", "",tmp)
+    sample_names_raw <- tmp
+    rm(tmp)
+}
+
+sample_names_razor <- paste("Razor...unique.peptides.",sample_names_raw, sep="")
+sample_names_unique <- paste("Unique.peptides.",sample_names_raw, sep="")
+sample_names_lfq <- paste("LFQ.intensity.",sample_names_raw, sep="")
+#another option would be
+#uniq <- data %>% select(starts_with("Unique.peptides."))
+
+#create data frame for razor
+results_2gether_razor <- data.frame(matrix(ncol = length(sample_names_raw), nrow = length(file.list)))
+row.names(results_2gether_razor) <- file.list
+colnames(results_2gether_razor) <- sample_names_raw
+#create data frame for unique
+results_2gether_unique <- data.frame(matrix(ncol = length(sample_names_raw), nrow = length(file.list)))
+row.names(results_2gether_unique) <- file.list
+colnames(results_2gether_unique) <- sample_names_raw
+#create data frame for lfq
+results_2gether_lfq <- data.frame(matrix(ncol = length(sample_names_raw), nrow = length(file.list)))
+row.names(results_2gether_lfq) <- file.list
+colnames(results_2gether_lfq) <- sample_names_raw
+
+
+#results lists
+results_razor <- list()
+results_unique <- list()
+results_lfq <- list()
+
+if (RAZOR == TRUE) {
+  cat("\n")
+  cat("##","Razor","\n")
+  cat("\n")
+for (x in file.list){
+  cat("\n")
+  cat("###",substring(x, 1, nchar(x)-4),"\n")
+  data_raw <- as.data.frame(res_raw[[x]])
+  data <- filtering(data_raw)
+  results <- data.frame(matrix(ncol = length(sample_names_raw), nrow = nrow(data)))
+  colnames(results) <- sample_names_raw
+  i <- 0
+  for (i in 1:length(sample_names_razor)){
+    name <- sample_names_razor[i]
+    tmp <- (data[name] >= unique)
+    results[i] <- tmp
+    cat(name,"<br/>",sum(tmp, na.rm = TRUE),"<br/>")
+  }
+  
+  results_razor[[x]] <- results
+  #assign(paste("results_razor",x,sep="_"),results) #create individual variable names
+  
+  #make venn diagramm
+  #venn(results)
+  
+  results_2gether_razor[x,] <- sapply(results,function(x)sum(x, na.rm = TRUE))
+  cat("\n")
+}
+}
+
+if (UNIQUE == TRUE) {
+  cat("\n")
+  cat("##","Unique","\n")
+  cat("\n")
+for (x in file.list){
+  cat("\n")
+  cat("###",substring(x, 1, nchar(x)-4),"\n")
+  data_raw <- as.data.frame(res_raw[[x]])
+  data <- filtering(data_raw)
+  results <- data.frame(matrix(ncol = length(sample_names_raw), nrow = nrow(data)))
+  colnames(results) <- sample_names_raw
+  i <- 0
+  for (i in 1:length(sample_names_unique)){
+    name <- sample_names_unique[i]
+    tmp <- (data[name] >= unique)
+    results[i] <- tmp
+    cat(name,"<br/>",sum(tmp, na.rm = TRUE),"<br/>")
+  }
+  
+  results_unique[[x]] <- results
+  #assign(paste("results_razor",x,sep="_"),results) #create individual variable names
+  
+  #make venn diagramm
+  #venn(results)
+  
+  results_2gether_unique[x,] <- sapply(results,function(x)sum(x, na.rm = TRUE))
+  cat("\n")
+}
+}
+
+if (LFQ == TRUE) {
+    cat("\n")
+  cat("##","LFQ","\n")
+  cat("\n")
+  for (x in file.list){
+    cat("\n")
+    cat("###",substring(x, 1, nchar(x)-4),"\n")
+    data_raw <- as.data.frame(res_raw[[x]])
+    data <- filtering(data_raw)
+    
+    results <- data.frame(matrix(ncol = length(sample_names_raw), nrow = nrow(data)))
+    colnames(results) <- sample_names_raw
+    i <- 0
+    for (i in 1:length(sample_names_lfq)){
+      name <- sample_names_lfq[i]
+      tmp <- log2(data[name])
+      tmp[tmp == -Inf] <- NA
+      results[i] <- tmp
+      cat(name,"<br/>",sum(!is.na(tmp)),"<br/>")
+      
+    }
+    
+    results_lfq[[x]] <- results
+    #assign(paste("results_lfq",x,sep="_"),results) #create individual variable names
+    
+   
+    results_2gether_lfq[x,] <-    sapply(results,function(x)sum(!is.na(x)))
+    cat("\n")
+    
+  }
+}
+
+#add number in column 4 for selection
+results_2gether_razor$number <- c(1:length(file.list))
+results_2gether_unique$number <- c(1:length(file.list))
+results_2gether_lfq$number <- c(1:length(file.list))
+
+#remove variables - clean up
+rm(data,
+   data_raw,
+   name,
+   results,
+   sample_names_razor,
+   sample_names_unique,
+   sample_names_lfq,
+   tmp,
+   x)
+```
+
+# Used time
+
+```{r end, message=FALSE, warning=FALSE, include=FALSE}
+end_time = format(Sys.time(), '%X')
+```
+
+
+
+```{r used time, echo=FALSE, message=TRUE, warning=FALSE}
+print(paste("Time used for analysis:", round(as.difftime(end_time, units = "mins")-as.difftime(start_time, units = "mins"),digits=2),"minutes"))
+```
+
+# Pool the data
+
+## Razor
+
+```{r}
+i = 0
+res_pool_razor_10fmol <- c()
+res_pool_razor_25fmol <- c()
+res_pool_razor_2fmol <- c()
+res_pool_razor_4fmol <- c()
+res_pool_razor_50fmol <- c()
+for (i in 1:10){
+  tmp <- apply(results_razor[[i]][1:3], 1, any)
+  res_pool_razor_10fmol <- c(res_pool_razor_10fmol, length(tmp[tmp == TRUE]))
+  tmp <- apply(results_razor[[i]][4:6], 1, any)
+  res_pool_razor_25fmol <- c(res_pool_razor_25fmol, length(tmp[tmp == TRUE]))
+  tmp <- apply(results_razor[[i]][7:9], 1, any)
+  res_pool_razor_2fmol <- c(res_pool_razor_2fmol, length(tmp[tmp == TRUE]))
+  tmp <- apply(results_razor[[i]][10:12], 1, any)
+  res_pool_razor_4fmol <- c(res_pool_razor_4fmol, length(tmp[tmp == TRUE]))
+  tmp <- apply(results_razor[[i]][13:15], 1, any)
+  res_pool_razor_50fmol <- c(res_pool_razor_50fmol, length(tmp[tmp == TRUE]))
+}
+```
+
+
+## Unique 
+
+```{r}
+i = 0
+res_pool_unique_10fmol <- c()
+res_pool_unique_25fmol <- c()
+res_pool_unique_2fmol <- c()
+res_pool_unique_4fmol <- c()
+res_pool_unique_50fmol <- c()
+
+
+for (i in 1:10){
+  tmp <- apply(results_unique[[i]][1:3], 1, any)
+  res_pool_unique_10fmol <- c(res_pool_unique_10fmol, length(tmp[tmp == TRUE]))
+  tmp <- apply(results_unique[[i]][4:6], 1, any)
+  res_pool_unique_25fmol <- c(res_pool_unique_25fmol, length(tmp[tmp == TRUE]))
+  tmp <- apply(results_unique[[i]][7:9], 1, any)
+  res_pool_unique_2fmol <- c(res_pool_unique_2fmol, length(tmp[tmp == TRUE]))
+  tmp <- apply(results_unique[[i]][10:12], 1, any)
+  res_pool_unique_4fmol <- c(res_pool_unique_4fmol, length(tmp[tmp == TRUE]))
+  tmp <- apply(results_unique[[i]][13:15], 1, any)
+  res_pool_unique_50fmol <- c(res_pool_unique_50fmol, length(tmp[tmp == TRUE]))
+}
+```
+
+## LFQ
+
+```{r}
+i = 0
+res_pool_lfq_10fmol <- c()
+res_pool_lfq_25fmol <- c()
+res_pool_lfq_2fmol <- c()
+res_pool_lfq_4fmol <- c()
+res_pool_lfq_50fmol <- c()
+
+
+for (i in 1:10){
+  sub <- results_lfq[[i]][1:3]
+  tmp <- sub[rowSums(is.na(sub)) != ncol(sub), ]
+  res_pool_lfq_10fmol <- c(res_pool_lfq_10fmol, nrow(tmp))
+  
+  sub <- results_lfq[[i]][4:6]
+  tmp <- sub[rowSums(is.na(sub)) != ncol(sub), ]
+  res_pool_lfq_25fmol <- c(res_pool_lfq_25fmol, nrow(tmp))
+  
+  sub <- results_lfq[[i]][7:9]
+  tmp <- sub[rowSums(is.na(sub)) != ncol(sub), ]
+  res_pool_lfq_2fmol <- c(res_pool_lfq_2fmol, nrow(tmp))
+  
+  sub <- results_lfq[[i]][10:12]
+  tmp <- sub[rowSums(is.na(sub)) != ncol(sub), ]
+  res_pool_lfq_4fmol <- c(res_pool_lfq_4fmol, nrow(tmp))
+  
+  sub <- results_lfq[[i]][13:15]
+  tmp <- sub[rowSums(is.na(sub)) != ncol(sub), ]
+  res_pool_lfq_50fmol <- c(res_pool_lfq_50fmol, nrow(tmp))
+  
+
+  }
+```
+  
+  
+
+
+## save to file
+
+```{r}
+res <- data.frame(cbind(res_pool_razor_10fmol,
+                        res_pool_razor_25fmol,
+                        res_pool_razor_2fmol,
+                        res_pool_razor_4fmol,
+                        res_pool_razor_50fmol,
+                        res_pool_unique_10fmol,
+                        res_pool_unique_25fmol,
+                        res_pool_unique_2fmol,
+                        res_pool_unique_4fmol,
+                        res_pool_unique_50fmol,
+                        res_pool_lfq_10fmol,
+                        res_pool_lfq_25fmol,
+                        res_pool_lfq_2fmol,
+                        res_pool_lfq_4fmol,
+                        res_pool_lfq_50fmol))
+colnames(res) <- paste(rep(c("Razor_", "Unique_", "LFQ_"),each = 5),rep(c("10fmol","25fmol","2fmol","4fmol","50fmol"),3),sep="")
+write.csv2(res, file = "./tmpfiles/UPS1_MBR_rerun.csv")
+```
