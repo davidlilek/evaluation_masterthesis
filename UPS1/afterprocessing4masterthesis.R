@@ -1,6 +1,6 @@
 ##########################################
 #
-# extracts
+# ups1
 #
 ##########################################
 
@@ -29,34 +29,120 @@ for (sample_name in sample_names){
 
 ####### comparing via concentration
 res_twopeptides <- readRDS("results_twopeptides.rds")
+#res_twopeptides <- readRDS("results_onepeptide.rds")
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
 number_proteins <- c()
 name <- c()
 conc <- c()
+rsd <- c()
+type <- c()
+evaluation <- c()
 for (sample_name in sample_names){
   tmp <- res_twopeptides[[sample_name]]
   number_proteins <- append(number_proteins,tmp[c(1,4,7,10,13,16),1])
   name <- append(name,
                  paste(tmp[c(1,4,7,10,13,16),3],"_",tmp[c(1,4,7,10,13,16),4], sep = ""))
   conc <- c(conc, rep(sample_name,6))
-  print(sample_name)
+  type <- c(type, paste(tmp[c(1,4,7,10,13,16),3]))
+  evaluation <- c(evaluation, paste(tmp[c(1,4,7,10,13,16),4]))
+  rsd <- c(rsd, paste(tmp[c(1,4,7,10,13,16),2]))
 }
 
 
-res_2gether <- as.data.frame(cbind(number_proteins,conc,name))
-colnames(res_2gether) <- c("NumberProteins","Concentration","Name")
+res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
+colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
 res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
-
-res_2gether$Concentration <- factor(res_2gether$Concentration,
-                                    levels = c("2fmol","4fmol","10fmol","25fmol","50fmol"))
-
+res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 6)
 
-ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Name)) +
+ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Type, linetype = Evaluation )) +
   geom_line() +
   geom_point() + 
   ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]")
+  xlab("Concentration [fmol]") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+
+
+ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Type, linetype = Evaluation )) +
+  geom_line() +
+  geom_point() + 
+  ylab("Number of Proteins") + 
+  xlab("Concentration [fmol]") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+
+########with all values
+sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
+number_proteins <- c()
+name <- c()
+conc <- c()
+rsd <- c()
+type <- c()
+evaluation <- c()
+for (sample_name in sample_names){
+  tmp <- res_twopeptides[[sample_name]]
+  number_proteins <- append(number_proteins,tmp[,1])
+  name <- append(name,
+                 paste(tmp[,3],"_",tmp[,4], sep = ""))
+  conc <- c(conc, rep(sample_name,6))
+  type <- c(type, paste(tmp[,3]))
+  evaluation <- c(evaluation, paste(tmp[,4]))
+  rsd <- c(rsd, paste(tmp[,2]))
+}
+
+
+res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
+colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
+res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
+res_2gether$rsd <- as.numeric(res_2gether$rsd)
+res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
+
+ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Type, linetype = Evaluation )) +
+  geom_line() +
+  geom_point() + 
+  ylab("Number of Proteins") + 
+  xlab("Concentration [fmol]") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+
+
+ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Type, linetype = Evaluation )) +
+  geom_line() +
+  geom_point() + 
+  ylab("Number of Proteins") + 
+  xlab("Concentration [fmol]") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+
+
+######################## compare no human proteins 
+# should be 47
+
+########with all values
+sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
+number_proteins <- c()
+name <- c()
+conc <- c()
+rsd <- c()
+type <- c()
+evaluation <- c()
+for (sample_name in sample_names){
+  tmp <- res_twopeptides[[sample_name]]
+  number_proteins <- append(number_proteins,tmp[,1])
+  name <- append(name,
+                 paste(tmp[,3],"_",tmp[,4], sep = ""))
+  conc <- c(conc, rep(sample_name,6))
+  type <- c(type, paste(tmp[,3]))
+  evaluation <- c(evaluation, paste(tmp[,4]))
+  rsd <- c(rsd, paste(tmp[,2]))
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

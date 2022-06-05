@@ -120,15 +120,17 @@ sample_names_lfq <- paste("LFQ.intensity.",sample_names_raw, sep="")
 results_2gether_razor <- data.frame(matrix(ncol = length(sample_names_raw), nrow = length(file.list)))
 row.names(results_2gether_razor) <- file.list
 colnames(results_2gether_razor) <- sample_names_raw
+results_2gether_razor_human <- results_2gether_razor
 #create data frame for unique
 results_2gether_unique <- data.frame(matrix(ncol = length(sample_names_raw), nrow = length(file.list)))
 row.names(results_2gether_unique) <- file.list
 colnames(results_2gether_unique) <- sample_names_raw
+results_2gether_unique_human <- results_2gether_unique
 #create data frame for lfq
 results_2gether_lfq <- data.frame(matrix(ncol = length(sample_names_raw), nrow = length(file.list)))
 row.names(results_2gether_lfq) <- file.list
 colnames(results_2gether_lfq) <- sample_names_raw
-
+results_2gether_lfq_human <- results_2gether_lfq
 
 #results lists
 results_razor <- list()
@@ -153,14 +155,16 @@ for (x in file.list){
     results[i] <- tmp
     cat(name,"<br/>",sum(tmp, na.rm = TRUE),"<br/>")
   }
-  
+  results$FASTA <- data$Fasta.headers
   results_razor[[x]] <- results
   #assign(paste("results_razor",x,sep="_"),results) #create individual variable names
   
   #make venn diagramm
   #venn(results)
   
-  results_2gether_razor[x,] <- sapply(results,function(x)sum(x, na.rm = TRUE))
+  results_2gether_razor_human[x,] <- sapply(dplyr::filter(results,grepl("Human",results$FASTA))[-6],function(x)sum(x, na.rm = TRUE))
+  
+  results_2gether_razor[x,] <- sapply(results[-6],function(x)sum(x, na.rm = TRUE))
   cat("\n")
 }
 }
@@ -183,14 +187,16 @@ for (x in file.list){
     results[i] <- tmp
     cat(name,"<br/>",sum(tmp, na.rm = TRUE),"<br/>")
   }
-  
+  results$FASTA <- data$Fasta.headers
   results_unique[[x]] <- results
   #assign(paste("results_razor",x,sep="_"),results) #create individual variable names
   
   #make venn diagramm
   #venn(results)
   
-  results_2gether_unique[x,] <- sapply(results,function(x)sum(x, na.rm = TRUE))
+  results_2gether_unique_human[x,] <- sapply(dplyr::filter(results,grepl("Human",results$FASTA))[-6],function(x)sum(x, na.rm = TRUE))
+
+  results_2gether_unique[x,] <- sapply(results[-6],function(x)sum(x, na.rm = TRUE))
   cat("\n")
 }
 }
@@ -216,14 +222,13 @@ if (LFQ == TRUE) {
       cat(name,"<br/>",sum(!is.na(tmp)),"<br/>")
       
     }
-    
+    results$FASTA <- data$Fasta.headers
     results_lfq[[x]] <- results
     #assign(paste("results_lfq",x,sep="_"),results) #create individual variable names
-    
+    results_2gether_lfq_human[x,] <- sapply(dplyr::filter(results,grepl("Human",results$FASTA))[-6],function(x)sum(!is.na(x)))
 
-
     
-    results_2gether_lfq[x,] <-    sapply(results,function(x)sum(!is.na(x)))
+    results_2gether_lfq[x,] <-    sapply(results[-6],function(x)sum(!is.na(x)))
     cat("\n")
     
   }
@@ -258,3 +263,8 @@ colnames(res) <- paste(rep(c("Razor_", "Unique_", "LFQ_"),each = 5),rep(colnames
 write.csv2(res, file = "./tmpfiles/UPS1_noMBR_pooled_rerun.csv")
 ```
 
+```{r}
+res <- data.frame(cbind(results_2gether_razor_human,results_2gether_unique_human,results_2gether_lfq_human))
+colnames(res) <- paste(rep(c("Razor_", "Unique_", "LFQ_"),each = 5),rep(colnames(results_2gether_lfq)[-6],3),sep="")
+write.csv2(res, file = "./tmpfiles/UPS1_noMBR_pooled_rerun_human.csv")
+```
