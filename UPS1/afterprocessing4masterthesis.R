@@ -96,20 +96,32 @@ res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
 res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
 
-ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Type, linetype = Evaluation )) +
+plot_no <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
   geom_point() + 
   ylab("Number of Proteins") + 
   xlab("Concentration [fmol]") +
+  scale_fill_brewer(palette="Dark2") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
 
 
-ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Type, linetype = Evaluation )) +
+plot_rsd <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
   geom_point() + 
-  ylab("Number of Proteins") + 
+  ylab("rsd [%]") + 
   xlab("Concentration [fmol]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+
+
+
+ggarrange(plot_no, plot_rsd, 
+          labels = c("A", "B"),
+          ncol = 1, nrow = 2,
+          common.legend = TRUE, legend="bottom")
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd.png"
+ggsave(pth,
+      width = 7,
+      height = 7)  
 
 
 ######################## compare no human proteins 
