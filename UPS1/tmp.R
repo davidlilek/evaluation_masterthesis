@@ -10,6 +10,8 @@ lfq_filtered__7<-dplyr::filter(results_lfq[[7]],grepl("Human",results_lfq[[7]]$F
 
 lfq_filtered$FASTA == lfq_filtered__2$FASTA
 
+
+
 results_lfq_human
 colMeans(do.call(rbind, results_lfq_human),na.rm = TRUE)
 
@@ -20,6 +22,7 @@ apply(simplify2array(results_lfq_human), 1:2, mean)
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
 results_lfq_human <- do.call(cbind, results_lfq_human)
 
+##### here it starts evluation mean lfq intensities
 
 results_lfq_human_mean <- c()
 for (sample_name in sample_names){

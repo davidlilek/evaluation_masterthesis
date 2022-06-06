@@ -241,6 +241,9 @@ results_2gether_razor$number <- c(1:length(file.list))
 results_2gether_unique$number <- c(1:length(file.list))
 results_2gether_lfq$number <- c(1:length(file.list))
 
+# save lfq human
+saveRDS(results_lfq_human, "./tmpfiles/lfq_human_noMBR_pooled_oldversion.rds")
+
 #remove variables - clean up
 rm(data,
    data_raw,

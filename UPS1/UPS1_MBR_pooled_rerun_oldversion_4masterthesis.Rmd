@@ -136,6 +136,7 @@ results_2gether_lfq_human <- results_2gether_lfq
 results_razor <- list()
 results_unique <- list()
 results_lfq <- list()
+results_lfq_human <- list()
 
 if (RAZOR == TRUE) {
   cat("\n")
@@ -227,6 +228,7 @@ if (LFQ == TRUE) {
     #assign(paste("results_lfq",x,sep="_"),results) #create individual variable names
     results_2gether_lfq_human[x,] <- sapply(dplyr::filter(results,grepl("Human",results$FASTA))[-6],function(x)sum(!is.na(x)))
 
+   results_lfq_human[[x]] <- dplyr::filter(results,grepl("Human",results$FASTA))[-6]
     
     results_2gether_lfq[x,] <-    sapply(results[-6],function(x)sum(!is.na(x)))
     cat("\n")
@@ -239,6 +241,8 @@ results_2gether_razor$number <- c(1:length(file.list))
 results_2gether_unique$number <- c(1:length(file.list))
 results_2gether_lfq$number <- c(1:length(file.list))
 
+# save lfq human
+saveRDS(results_lfq_human, "./tmpfiles/lfq_human_MBR_pooled_oldversion.rds")
 #remove variables - clean up
 rm(data,
    data_raw,
