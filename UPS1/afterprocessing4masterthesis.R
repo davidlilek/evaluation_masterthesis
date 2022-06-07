@@ -195,7 +195,10 @@ A <- results_numberhumanproteins %>%
   geom_point() + 
   ylab("Number of Proteins") + 
   xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
+  labs(color = "Type", linetype = "Peptides") +
+  facet_wrap(~type)+
+  ylim(c(30,47))
 
 B <- results_numberhumanproteins %>% 
   dplyr::filter(evaluationmethod == "MBR_pooled_oldversion") %>%
@@ -204,7 +207,10 @@ B <- results_numberhumanproteins %>%
   geom_point() + 
   ylab("Number of Proteins") + 
   xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
+  labs(color = "Type", linetype = "Peptides") +
+  facet_wrap(~type)+
+  ylim(c(30,47))
 
 
 C <- results_numberhumanproteins %>% 
@@ -214,7 +220,10 @@ C <- results_numberhumanproteins %>%
   geom_point() + 
   ylab("Number of Proteins") + 
   xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
+  labs(color = "Type", linetype = "Peptides") +
+  facet_wrap(~type)+
+  ylim(c(30,47))
 
 D <- results_numberhumanproteins %>% 
   dplyr::filter(evaluationmethod == "noMBR_pooled_oldversion") %>%
@@ -223,7 +232,10 @@ D <- results_numberhumanproteins %>%
   geom_point() + 
   ylab("Number of Proteins") + 
   xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
+  labs(color = "Type", linetype = "Peptides") +
+  facet_wrap(~type) +
+  ylim(c(30,47))
 
 ggarrange(A,B,C,D, 
           labels = c("A", "B", "C", "D"),
@@ -233,6 +245,9 @@ pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthes
 ggsave(pth,
        width = 7,
        height = 7) 
+
+
+  
 
 
 ###############################################################
