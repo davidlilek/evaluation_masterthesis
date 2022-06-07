@@ -188,56 +188,26 @@ mean_human_proteins <- c(res_number_human_proteins_onepeptide,res_number_human_p
 
 results_numberhumanproteins <- data.frame(mean_human_proteins, type, conc, peptides, evaluationmethod)
 
-A <- results_numberhumanproteins %>% 
-  dplyr::filter(evaluationmethod == "MBR_pooled") %>%
-  ggplot(., aes(x=conc, y=mean_human_proteins, color = type, linetype = peptides)) +
-  geom_line() +
-  geom_point() + 
-  ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
-  labs(color = "Type", linetype = "Peptides") +
-  facet_wrap(~type)+
-  ylim(c(30,47))
+evaluationmethod_forloop <- c("MBR_pooled", "MBR_pooled_oldversion", "noMBR_pooled", "noMBR_pooled_oldversion")
+plots_numberhumanproteins <- list()
+for (evaluation in evaluationmethod_forloop){
+  plot <- results_numberhumanproteins %>% 
+    dplyr::filter(evaluationmethod == evaluation) %>%
+    ggplot(., aes(x=conc, y=mean_human_proteins, color = type, linetype = peptides)) +
+    geom_line() +
+    geom_point() + 
+    ylab("Number of Proteins") + 
+    xlab("Concentration [fmol]") +
+    theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
+    labs(color = "Type", linetype = "Peptides") +
+    facet_wrap(~type)+
+    ylim(c(30,47)) +
+    theme(strip.background = element_blank(),
+          strip.text.x = element_blank())
+  plots_numberhumanproteins[[evaluation]] <- plot  
+}
 
-B <- results_numberhumanproteins %>% 
-  dplyr::filter(evaluationmethod == "MBR_pooled_oldversion") %>%
-  ggplot(., aes(x=conc, y=mean_human_proteins, color = type, linetype = peptides)) +
-  geom_line() +
-  geom_point() + 
-  ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
-  labs(color = "Type", linetype = "Peptides") +
-  facet_wrap(~type)+
-  ylim(c(30,47))
-
-
-C <- results_numberhumanproteins %>% 
-  dplyr::filter(evaluationmethod == "noMBR_pooled") %>%
-  ggplot(., aes(x=conc, y=mean_human_proteins, color = type, linetype = peptides)) +
-  geom_line() +
-  geom_point() + 
-  ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
-  labs(color = "Type", linetype = "Peptides") +
-  facet_wrap(~type)+
-  ylim(c(30,47))
-
-D <- results_numberhumanproteins %>% 
-  dplyr::filter(evaluationmethod == "noMBR_pooled_oldversion") %>%
-  ggplot(., aes(x=conc, y=mean_human_proteins, color = type, linetype = peptides)) +
-  geom_line() +
-  geom_point() + 
-  ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
-  labs(color = "Type", linetype = "Peptides") +
-  facet_wrap(~type) +
-  ylim(c(30,47))
-
-ggarrange(A,B,C,D, 
+ggarrange(plotlist = plots_numberhumanproteins,
           labels = c("A", "B", "C", "D"),
           ncol = 2, nrow = 2,
           common.legend = TRUE, legend="bottom")
@@ -248,69 +218,3 @@ ggsave(pth,
 
 
   
-
-
-###############################################################
-#
-#  OLD STUFF
-#
-###################################
-
-# for (sample_name in sample_names){
-#   ggarrange(plots_no_twopeptides[[sample_name]], plots_rsd_twopeptides[[sample_name]], 
-#             labels = c("A", "B"),
-#             ncol = 2, nrow = 1,
-#             common.legend = TRUE, legend="bottom")
-#   pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun",sample_name,".png",sep="")
-#   ggsave(pth,
-#          width = 7,
-#          height = 7)  
-# }
-# 
-# figure <- ggarrange(plotlist=c(plots_no_twopeptides, plots_rsd_twopeptides), 
-#           labels = c(1:12),
-#           ncol = 2, nrow = 6,
-#           common.legend = TRUE, legend="bottom")
-# 
-# remove_y <- theme(
-#   axis.text.y = element_blank(),
-#   axis.ticks.y = element_blank(),
-#   axis.title.y = element_blank()
-# )
-# 
-# annotate_figure(figure,
-#                 top = text_grob("Visualizing Tooth Growth", color = "red", face = "bold", size = 14),
-#                 bottom = text_grob("Data source: \n ToothGrowth data set", color = "blue",
-#                                    hjust = 1, x = 1, face = "italic", size = 10),
-#                 left = text_grob("Figure arranged using ggpubr", color = "green", rot = 90),
-#                 right = text_grob(bquote("Superscript: ("*kg~NH[3]~ha^-1~yr^-1*")"), rot = 90),
-#                 fig.lab = "Figure 1", fig.lab.face = "bold"
-# )
-# 
-# 
-# pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_try.png"
-# ggsave(pth,
-#        width = 14,
-#        height = 14)  
-# 
-# 
-# 
-# 
-# 
-# # run first qc summary rerun one & two peptides
-# p <- ggarrange(p_plot_one, p_plot_two, rsd_plot_one, rsd_plot_two, 
-#                labels = c("A", "B", "C", "D"),
-#                ncol = 2, nrow = 2,
-#                common.legend = TRUE, legend="bottom")
-# ggsave("../pics/extracts_rerun.png",
-#        width = 7,
-#        height = 7)
-# 
-# #run first qc summary rerun one peptide
-# df$rsd <- round(df$rsd,3)
-# knitr::kable(df, booktabs = T, "latex")
-# #run first qc summary rerun two peptides
-# df$rsd <- round(df$rsd,3)
-# knitr::kable(df, booktabs = T, "latex")
-# 
-# 
