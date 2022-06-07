@@ -2,8 +2,8 @@
 # compare lfq intensities
 #
 # reads in log2 lfq intensities from rerun experiment @ different concentration
-# evaluation was performed with one and two unique peptides
-# for each quantified protein a linear model was fitted 
+# evaluation was performed with two unique peptides 
+# for each quantified protein a linear model was fitted (conc was log2 transformed before)
 # r2, intercept and slope were saved an visualized
 # res_raw[[3]][[8]] was removed because only 46 human proteins occured
 #
@@ -58,7 +58,7 @@ for (i in 1:4){
   fitted_models <- results_lfq_human_mean %>% 
     group_by(protein) %>% 
     filter(!any(is.na(mean))) %>%
-    do(model = lm(mean ~ conc, data = .))
+    do(model = lm(mean ~ log2(conc), data = .))
   
   
   onepeptide[[i]] <- fitted_models %>% do(data.frame(coef_intercept = coef(.$mod)[[1]],

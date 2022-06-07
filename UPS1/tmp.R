@@ -70,3 +70,31 @@ library(dplyr)
 library(tidyr)
 library(broom)
 fitted_models_coeff <- glance(fitted_models, model)
+
+i=0
+
+par(mfrow = c(4, 4))
+
+for (i in 1:16){
+  model <- lm(fitted_models[[2]][[i]]$model$mean ~ log2(fitted_models[[2]][[i]]$model$conc))
+  plot(fitted_models[[2]][[i]]$model$mean ~ log2(fitted_models[[2]][[i]]$model$conc), main = i,xlab="",ylab="")
+  abline(model, col="red")
+}
+
+par(mfrow = c(4, 4))
+
+for (i in 17:32){
+  model <- lm(fitted_models[[2]][[i]]$model$mean ~ log2(fitted_models[[2]][[i]]$model$conc))
+  plot(fitted_models[[2]][[i]]$model$mean ~ log2(fitted_models[[2]][[i]]$model$conc), main = i,xlab="",ylab="")
+  abline(model, col="red")
+}
+
+model <- lm(fitted_models[[2]][[2]]$model$mean ~ log2(fitted_models[[2]][[2]]$model$conc)
+            
+            y <- model$model$mean
+            x <- model$model$conc
+            
+            plot(log2(x),y)
+            m <- lm(y ~ log2(x))
+            summary(m)
+            
