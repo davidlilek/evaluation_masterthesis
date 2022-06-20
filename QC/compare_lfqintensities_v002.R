@@ -167,8 +167,8 @@ for (grd in 1:nrow(grid)){
   result[c("pvalue","mean_A","sd_A","mean_B","sd_B")] <- NA
   
   # define threshold for NA values of A & B
-  b.A <- rowSums(is.na(m_2gether[,A])) <= 2
-  b.B <- rowSums(is.na(m_2gether[,B])) <= 2
+  b.A <- rowSums(is.na(m_2gether[,A])) <= 5
+  b.B <- rowSums(is.na(m_2gether[,B])) <= 5
   # calculate row wise mean for A and B
   mean.A <- rowMeans(m_2gether[rowSums(is.na(m_2gether))<= 2,A],
                  na.rm = TRUE)
@@ -193,12 +193,12 @@ for (grd in 1:nrow(grid)){
         result[i,"pvalue"] <- ttest$p.value
       } else {
         if (result[i, "mean_A"] == result[i, "mean_B"]){
-          result[i,"pvalue"] <- 0
-        } else {result[i,"pvalue"] <- 1}
+          result[i,"pvalue"] <- 1
+        } else {result[i,"pvalue"] <- 0}
       }
       
-    } else if (b.A[i] || b.B[i]){
-      result[i,"pvalue"] <- 0
+    } else if (!(b.A[i] && b.B[i])){
+      result[i,"pvalue"] <- NA
       result[i,"mean_A"] <- mean(as.numeric(m_2gether[i,A]), na.rm = TRUE)
       result[i,"sd_A"] <- sd(as.numeric(m_2gether[i,A]), na.rm = TRUE)
       result[i,"mean_B"] <- mean(as.numeric(m_2gether[i,B]), na.rm = TRUE)
@@ -208,12 +208,11 @@ for (grd in 1:nrow(grid)){
   
   # remove all rows which only contain NA values
   result.clear <- result[rowSums(is.na(result[,-1])) != ncol(result[,-1]), ]
-  
+  # remove all results with p value NA
+  result.clear <- result.clear[!is.na(result.clear$pvalue),]
   # p value adjustment
   p <- result.clear$pvalue
-  result.clear$pvalue <- p.adjust(p, method = "BY", n = length(p))
-
-  
+  result.clear$pvalue <- p.adjust(p, method = "BH", n = length(p))
   # set all NaN values to 0
   result.clear$mean_A[is.nan(result.clear$mean_A)] <- 0
   result.clear$mean_B[is.nan(result.clear$mean_B)] <- 0
@@ -308,7 +307,8 @@ colnames(res_plot_group) <- c("Group", "Comparison", "counts")
 res_plot_group$counts <- as.double(res_plot_group$counts)
 # create stacked barplot
 b_plot <- ggplot(res_plot_group, aes(fill = Group, y = counts, x=Comparison, label = counts)) +
-  geom_bar( position = "stack",stat="identity") # +  geom_text(size = 2, position = position_stack(vjust = 0.5))
+  geom_bar( position = "stack",stat="identity") + 
+  geom_text(size = 2, position = position_stack(vjust = 0.5))
 b_plot
 ggsave("../pics/barplot_lfqintensities.png",
        width = 7,
