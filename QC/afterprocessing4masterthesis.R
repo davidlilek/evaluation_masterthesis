@@ -3,7 +3,7 @@ p <- ggarrange(p_plot_one, p_plot_two, rsd_plot_one, rsd_plot_two,
                labels = c("A", "B", "C", "D"),
                ncol = 2, nrow = 2,
                common.legend = TRUE, legend="bottom")
-ggsave("./pics/QC_rerun.png",
+ggsave("../pics/QC_rerun_secondpeptides.png",
        width = 7,
        height = 7)
 

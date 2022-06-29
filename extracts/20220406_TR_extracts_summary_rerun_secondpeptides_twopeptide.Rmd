@@ -1,0 +1,199 @@
+---
+title: "DataAnalysis - Postprocessing Results MaxQuant"
+autor: David Lilek
+date: "`r format(Sys.time(), '%d %B %Y, %X')`"
+output:
+  html_document:
+    df_print: paged
+    fig.align: center
+    self_contained: yes
+    fig.height: 4
+    fig.width: 8
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    number_sections: yes
+    code_folding: hide
+---
+
+```{r start, message=FALSE, warning=FALSE, include=FALSE}
+start_time = format(Sys.time(), '%X')
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+#load libraries
+library(tidyverse)
+library(dplyr)
+library(gplots)
+library(reshape2) #for melting data for boxplot with ggplot
+library(pheatmap)
+library(MASS)
+library(ggpubr)
+library(kableExtra)
+```
+
+
+```{r results="asis"}
+###############################
+#
+#define settings
+#
+###############################
+
+path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/extracts/tmpfiles/extracts_twouniquepeptide/"
+
+##########read in all data with pattern .txt
+# get file list
+file.list <- list.files(path = path, pattern='*.csv')
+file.list <- file.list[-c(2,4,6,8)]
+# create file path
+file.path <- paste(path,file.list,sep = "")
+# read in files - for each file one variable is created - results are stored in a list
+res_raw <- lapply(file.path, function(i){read.csv2(i, row.names = 1)})
+names(res_raw) <- file.list
+```
+
+```{r}
+#create data.frame
+res<-as.data.frame(res_raw)
+rownames(res) <- NULL
+```
+
+```{r}
+#functions
+CV <- function(x){
+  (sd(x)/mean(x))*100
+}
+
+MEAN <- function(x){
+  mean(x)
+}
+```
+
+
+```{r}
+#set sample name
+sample_names <- c("_A","_B","_C","_D","_E","_F")
+col_names <- c("MBR_pooled","MBR_pooled\nsecondpeptides","noMBR_pooled","noMBR_pooled\nsecondpeptides")
+```
+
+
+```{r, results="asis"}
+plots_no_twopeptides <- list()
+plots_rsd_twopeptides <- list()
+for (sample_name in sample_names){
+  cat("\n")
+  cat("#",sample_name,"\n")
+  cat("\n")
+
+  #razor
+  razor <- res %>%
+    dplyr::select(ends_with(sample_name) & contains("Razor"))
+  colnames(razor) <- col_names
+
+  #unique
+  unique <- res %>%
+  dplyr::select(ends_with(sample_name) & contains("Unique"))
+  colnames(unique) <- col_names
+
+  #lfq
+  lfq <- res %>%
+  dplyr::select(ends_with(sample_name) & contains("LFQ"))
+  colnames(lfq) <- col_names
+
+  #plot data
+  no <- c(apply(razor,2,MEAN),apply(unique,2,MEAN),apply(lfq,2,MEAN))
+  no <- round(no,1)
+  rsd <- c(apply(razor,2,CV),apply(unique,2,CV),apply(lfq,2,CV))
+  rsd <- round(rsd,3)
+  
+  evaluation <- rep(col_names,3)
+  type <- c("Razor","Unique","LFQ")
+  type <- rep(type, each=length(file.list))
+  
+  df <- data.frame(no, rsd, type, evaluation)
+  colnames(df) <- c("no","rsd","Type","Evaluation")
+  
+  print(df %>%
+  kbl() %>%
+  kable_styling())
+  
+  #reorder x axis
+  df$Type <- factor(df$Type,
+                    levels = c("Razor","Unique","LFQ"))
+  df$Evaluation <- factor(df$Evaluation,
+                                 levels = c("MBR_pooled","MBR_pooled\nsecondpeptides","noMBR_pooled","noMBR_pooled\nsecondpeptides"))
+  p_plot_two <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
+      geom_bar(stat='identity', position='dodge') +
+    theme_minimal() +
+    scale_fill_brewer(palette="Dark2") +
+    theme(legend.position="bottom") +
+    theme(legend.key.size = unit(0.15, 'cm')) +
+    guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+    ylab("No. of protein identifications") +
+    labs(fill = "Evaluation \n method") +
+    coord_cartesian(ylim=c(200,1200))
+    # scale_y_break(c(100,1200)) with library(ggbreak)
+    print(p_plot_two)
+    
+        
+    #plot data
+    rsd_plot_two <- ggplot(df, aes(x=Type, y=rsd, fill=Evaluation)) +
+      geom_bar(stat='identity', position='dodge') +
+    theme_minimal() +
+    scale_fill_brewer(palette="Dark2") +
+    theme(legend.position="bottom") +
+    theme(legend.key.size = unit(0.15, 'cm')) +
+    guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+    ylab("relative sd [%]") +
+    labs(fill = "Evaluation \n method")+
+    coord_cartesian(ylim=c(0,2.5))
+    print(rsd_plot_two)
+    cat("\n")
+    
+    plots_no_twopeptides[[sample_name]] <- p_plot_two
+    plots_rsd_twopeptides[[sample_name]] <- rsd_plot_two
+    
+}
+```
+
+```{r}
+saveRDS(plots_no_twopeptides, file = "plots_no_secondpeptides_twopeptides.rds")
+saveRDS(plots_rsd_twopeptides, file = "plots_rsd_secondpeptides_twopeptides.rds")
+saveRDS(df, file = "results_seconpeptides_twopeptides.rds")
+```
+
+```{r eval=FALSE, include=FALSE}
+df_onepeptide <- readRDS("20220406_TR_QC_summary_rerun_secondpeptides_onepeptide.rds")
+t <- df_onepeptide$no/df$no
+tt <- (1-t[1:12])*100
+t_sd <- df_onepeptide$rsd/df$rsd
+tt_sd <- (t[1:12]-1)*100
+df_comp <- as.data.frame(cbind(tt,tt_sd))
+colnames(df_comp) <- c("Protein identification","rsd")
+boxplot(df_comp$`Protein identification`, df_comp$rsd, ylab ="Deviation one peptide vs two peptides [%]", names = colnames(df_comp))
+```
+# LaTeX
+
+```{r}
+knitr::kable(df, booktabs = T, "latex")
+```
+
+
+
+# Used time
+
+```{r end, message=FALSE, warning=FALSE, include=FALSE}
+end_time = format(Sys.time(), '%X')
+```
+
+
+
+```{r used time, echo=FALSE, message=TRUE, warning=FALSE}
+print(paste("Time used for analysis:", round(as.difftime(end_time, units = "mins")-as.difftime(start_time, units = "mins"),digits=2),"minutes"))
+```

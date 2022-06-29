@@ -29,6 +29,27 @@ for (sample_name in sample_names){
          height = 7)  
 }
 
+######## for second peptide analysis
+
+plots_no_twopeptides <- readRDS("plots_no_secondpeptides_twopeptides.rds")
+plots_rsd_twopeptides <- readRDS("plots_rsd_secondpeptides_twopeptides.rds")
+plots_no_onepeptide <- readRDS("plots_no_secondpeptides_onepeptide.rds")
+plots_rsd_onepeptide <- readRDS("plots_rsd_secondpeptides_onepeptide.rds")
+sample_names <- c("_A","_B","_C","_D","_E","_F")
+
+
+
+
+for (sample_name in sample_names){
+  ggarrange(plots_no_onepeptide[[sample_name]],plots_no_twopeptides[[sample_name]], plots_rsd_onepeptide[[sample_name]] ,plots_rsd_twopeptides[[sample_name]], 
+            labels = c("A", "B", "C", "D"),
+            ncol = 2, nrow = 2,
+            common.legend = TRUE, legend="bottom")
+  pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_secondpeptides",sample_name,".png",sep="")
+  ggsave(pth,
+         width = 7,
+         height = 7)  
+}
 
 
 
