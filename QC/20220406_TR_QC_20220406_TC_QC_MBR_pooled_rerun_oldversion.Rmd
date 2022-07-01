@@ -71,13 +71,13 @@ The txt-files were read in, processed and filtered automatically. This section s
 
 GET_SAMPLE_NAMES <- TRUE # if set to false define it in the next line
 # sample_names_raw <- c("A1","A2","A3")
-unique <- 2  #how many peptides should be necessary to identify a protein
+unique <- 2 #how many peptides should be necessary to identify a protein
 
 RAZOR <- TRUE #TRUE | FALSE
 UNIQUE <- TRUE #TRUE | FALSE
 LFQ <- TRUE #TRUE | FALSE
 
-path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/3_20220406_TR/20220406_TC_QC_noMBR_pooled_rerun_oldversion_4masterthesis/"
+path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/3_20220406_TR/20220406_TR_QC_MBR_pooled_rerun_oldversion_4masterthesis/"
 #path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/R/"
 
 # load functions

@@ -38,8 +38,6 @@ plots_rsd_onepeptide <- readRDS("plots_rsd_secondpeptides_onepeptide.rds")
 sample_names <- c("_A","_B","_C","_D","_E","_F")
 
 
-
-
 for (sample_name in sample_names){
   ggarrange(plots_no_onepeptide[[sample_name]],plots_no_twopeptides[[sample_name]], plots_rsd_onepeptide[[sample_name]] ,plots_rsd_twopeptides[[sample_name]], 
             labels = c("A", "B", "C", "D"),
@@ -53,6 +51,22 @@ for (sample_name in sample_names){
 
 
 
+
+### combine A-B
+
+sample_name1 <- "_C"
+sample_name2 <- "_D"
+ggarrange(plots_no_onepeptide[[sample_name1]],plots_no_twopeptides[[sample_name1]], plots_rsd_onepeptide[[sample_name1]] ,plots_rsd_twopeptides[[sample_name1]], 
+         plots_no_onepeptide[[sample_name2]],plots_no_twopeptides[[sample_name2]], plots_rsd_onepeptide[[sample_name2]] ,plots_rsd_twopeptides[[sample_name2]], 
+         labels = c("A", "B", "C", "D","a","b","c","d"),
+         ncol = 2, nrow = 4,
+         common.legend = TRUE, legend="top",
+         hjust = c(rep(-4.5,4),rep(-5.25,4)),
+         align = "hv")
+pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_secondpeptides_compare",sample_name1,sample_name2,".png",sep="")
+ggsave(pth,
+       width = 7,
+       height = 7)  
 
 ###############################################################
 #

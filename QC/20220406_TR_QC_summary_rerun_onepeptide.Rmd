@@ -48,6 +48,7 @@ path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthes
 ##########read in all data with pattern .txt
 # get file list
 file.list <- list.files(path = path, pattern='*.csv')
+file.list <- file.list[-c(3,7)]
 # create file path
 file.path <- paste(path,file.list,sep = "")
 # read in files - for each file one variable is created - results are stored in a list
@@ -192,6 +193,81 @@ In summary it can be said, that using the old version leads to less protein iden
 ```{r}
 saveRDS(df, file = "20220406_TR_QC_summary_rerun_onepeptide.rds")
 ```
+
+# Relative deviations
+
+
+
+```{r}
+df.clear <- df
+
+### - mean
+df.clear$meandiff[1:6] <- df.clear$no[1:6]-median(df.clear$no[1:6])
+df.clear$meandiff[7:12] <- df.clear$no[7:12]-median(df.clear$no[7:12])
+df.clear$meandiff[13:18] <- df.clear$no[13:18]-median(df.clear$no[13:18])
+p_plot_two <- ggplot(df.clear, aes(x=Type, y=meandiff, fill=Evaluation)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("No. of protein identifications\n Deviation from median(type)") +
+  labs(fill = "Evaluation \n method")
+p_plot_two
+
+
+### - mean/mean *100
+df.clear <- df
+df.clear$meandiff[1:6] <- (df.clear$no[1:6]-median(df.clear$no[1:6]))/median(df.clear$no[1:6])*100
+df.clear$meandiff[7:12] <- (df.clear$no[7:12]-median(df.clear$no[7:12]))/median(df.clear$no[7:12])*100
+df.clear$meandiff[13:18] <- (df.clear$no[13:18]-median(df.clear$no[13:18]))/median(df.clear$no[13:18])*100
+p_plot_two <- ggplot(df.clear, aes(x=Type, y=meandiff, fill=Evaluation)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("No. of protein identifications\n Relative deviation from median(type)") +
+  labs(fill = "Evaluation \n method")
+p_plot_two
+
+df.clear <- df
+
+### - mean
+df.clear$meandiff[1:6] <- df.clear$rsd[1:6]-median(df.clear$rsd[1:6])
+df.clear$meandiff[7:12] <- df.clear$rsd[7:12]-median(df.clear$rsd[7:12])
+df.clear$meandiff[13:18] <- df.clear$rsd[13:18]-median(df.clear$rsd[13:18])
+p_plot_two <- ggplot(df.clear, aes(x=Type, y=meandiff, fill=Evaluation)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("relative sd [%] \n Deviation from median(type)") +
+  labs(fill = "Evaluation \n method")
+p_plot_two
+
+
+### - mean/mean *100
+df.clear <- df
+df.clear$meandiff[1:6] <- (df.clear$rsd[1:6]-median(df.clear$rsd[1:6]))/median(df.clear$rsd[1:6])*100
+df.clear$meandiff[7:12] <- (df.clear$rsd[7:12]-median(df.clear$rsd[7:12]))/median(df.clear$rsd[7:12])*100
+df.clear$meandiff[13:18] <- (df.clear$rsd[13:18]-median(df.clear$rsd[13:18]))/median(df.clear$rsd[13:18])*100
+p_plot_two <- ggplot(df.clear, aes(x=Type, y=meandiff, fill=Evaluation)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("relative sd [%] \n Relative deviation from median(type)") +
+  labs(fill = "Evaluation \n method")
+p_plot_two
+```
+
 
 # LaTeX
 
