@@ -35,7 +35,8 @@ file.path <- paste(path,file.list,sep = "")
 res_raw <- lapply(file.path, function(i){readRDS(i)})
 names(res_raw) <- file.list
 
-#remove run 7 because it has only 46 human proteins
+#remove run 1 because it has only 46 human proteins
+res_raw[[1]][[1]] <- NA
 res_raw[[3]][[8]] <- NA
 
 i <- 0 
@@ -109,3 +110,9 @@ pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthes
 ggsave(pth,
         width = 10,
         height = 7)  
+
+# additional code
+MBR <- subset(res, name == "onepetide1" | name == "onepetide2" )
+noMBR <- subset(res, name == "onepetide3" | name == "onepetide4" )
+
+boxplot(MBR$lfq_2gether_vector,noMBR$lfq_2gether_vector)

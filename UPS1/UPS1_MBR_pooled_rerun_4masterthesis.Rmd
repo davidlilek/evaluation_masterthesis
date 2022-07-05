@@ -77,7 +77,7 @@ RAZOR <- TRUE #TRUE | FALSE
 UNIQUE <- TRUE #TRUE | FALSE
 LFQ <- TRUE #TRUE | FALSE
 
-path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/2_UPS1/UPS1_noMBR_pooled_rerun_oldversion_4masterthesis/"
+path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/2_UPS1/UPS1_MBR_pooled_rerun_4masterthesis/"
 #path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/R/"
 
 # load functions

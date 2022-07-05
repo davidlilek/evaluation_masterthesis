@@ -27,10 +27,8 @@ for (sample_name in sample_names){
 }
 
 
-####### comparing via concentration
+####### comparing via concentration two peptides
 res_twopeptides <- readRDS("results_twopeptides.rds")
-#change also file name for png file if you run it with one peptide
-#res_twopeptides <- readRDS("results_onepeptide.rds")
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
 number_proteins <- c()
 name <- c()
@@ -100,11 +98,114 @@ res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
 plot_no <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
   geom_point() + 
-  ylab("Number of Proteins") + 
+  ylab("Number of proteins") + 
   xlab("Concentration [fmol]") +
   scale_fill_brewer(palette="Dark2") +
   labs(color = "Evaluation \n method") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
+
+plot_rsd <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
+  geom_line() +
+  geom_point() + 
+  ylab("rsd [%]") + 
+  xlab("Concentration [fmol]") +
+  labs(color = "Evaluation \n method") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
+
+
+
+ggarrange(plot_no, plot_rsd, 
+          labels = c("A", "B"),
+          ncol = 1, nrow = 2,
+          common.legend = TRUE, legend="bottom")
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd_twopeptides.png"
+ggsave(pth,
+      width = 7,
+      height = 7)  
+
+res_2gether_twopeptides <- res_2gether
+
+############################
+####### comparing via concentration one peptides
+#############################
+res_twopeptides <- readRDS("results_onepeptide.rds")
+sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
+number_proteins <- c()
+name <- c()
+conc <- c()
+rsd <- c()
+type <- c()
+evaluation <- c()
+for (sample_name in sample_names){
+  tmp <- res_twopeptides[[sample_name]]
+  number_proteins <- append(number_proteins,tmp[c(1,4,7,10,13,16),1])
+  name <- append(name,
+                 paste(tmp[c(1,4,7,10,13,16),3],"_",tmp[c(1,4,7,10,13,16),4], sep = ""))
+  conc <- c(conc, rep(sample_name,6))
+  type <- c(type, paste(tmp[c(1,4,7,10,13,16),3]))
+  evaluation <- c(evaluation, paste(tmp[c(1,4,7,10,13,16),4]))
+  rsd <- c(rsd, paste(tmp[c(1,4,7,10,13,16),2]))
+}
+
+
+res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
+colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
+res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
+res_2gether$rsd <- as.numeric(res_2gether$rsd)
+res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 6)
+
+ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Type, linetype = Evaluation )) +
+  geom_line() +
+  geom_point() + 
+  ylab("Number of Proteins") + 
+  xlab("Concentration [fmol]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+
+
+ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Type, linetype = Evaluation )) +
+  geom_line() +
+  geom_point() + 
+  ylab("Number of Proteins") + 
+  xlab("Concentration [fmol]") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+
+########with all values
+sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
+number_proteins <- c()
+name <- c()
+conc <- c()
+rsd <- c()
+type <- c()
+evaluation <- c()
+for (sample_name in sample_names){
+  tmp <- res_twopeptides[[sample_name]]
+  number_proteins <- append(number_proteins,tmp[,1])
+  name <- append(name,
+                 paste(tmp[,3],"_",tmp[,4], sep = ""))
+  conc <- c(conc, rep(sample_name,6))
+  type <- c(type, paste(tmp[,3]))
+  evaluation <- c(evaluation, paste(tmp[,4]))
+  rsd <- c(rsd, paste(tmp[,2]))
+}
+
+
+res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
+colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
+res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
+res_2gether$rsd <- as.numeric(res_2gether$rsd)
+res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
+
+plot_no <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
+  geom_line() +
+  geom_point() + 
+  ylab("Number of proteins") + 
+  xlab("Concentration [fmol]") +
+  scale_fill_brewer(palette="Dark2") +
+  labs(color = "Evaluation \n method") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) + 
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
 
 
 plot_rsd <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
@@ -113,7 +214,8 @@ plot_rsd <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, col
   ylab("rsd [%]") + 
   xlab("Concentration [fmol]") +
   labs(color = "Evaluation \n method") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
 
 
 
@@ -121,11 +223,13 @@ ggarrange(plot_no, plot_rsd,
           labels = c("A", "B"),
           ncol = 1, nrow = 2,
           common.legend = TRUE, legend="bottom")
-pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd.png"
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd_onepeptide.png"
 ggsave(pth,
-      width = 7,
-      height = 7)  
+       width = 7,
+       height = 7)  
 
+
+res_2gether_onepeptide <- res_2gether
 
 ######################## compare no human proteins 
 # should be 47
@@ -196,7 +300,7 @@ for (evaluation in evaluationmethod_forloop){
     ggplot(., aes(x=conc, y=mean_human_proteins, color = type, linetype = peptides)) +
     geom_line() +
     geom_point() + 
-    ylab("Number of Proteins") + 
+    ylab("Number of proteins") + 
     xlab("Concentration [fmol]") +
     theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
     labs(color = "Type", linetype = "Peptides") +
