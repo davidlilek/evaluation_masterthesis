@@ -8,6 +8,8 @@ library(ggpubr)
 library(stringr)
 library(dplyr)
 
+# load plots
+
 plots_no_twopeptides <- readRDS("plots_no_twopeptides.rds")
 plots_rsd_twopeptides <- readRDS("plots_rsd_twopeptides.rds")
 plots_no_onepeptide <- readRDS("plots_no_onepeptide.rds")
@@ -15,6 +17,7 @@ plots_rsd_onepeptide <- readRDS("plots_rsd_onepeptide.rds")
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
 
 
+# create single plots for each concentration
 
 
 for (sample_name in sample_names){
@@ -29,7 +32,9 @@ for (sample_name in sample_names){
 }
 
 
+
 ####### comparing via concentration two peptides
+
 res_twopeptides <- readRDS("results_twopeptides.rds")
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
 number_proteins <- c()
@@ -38,47 +43,7 @@ conc <- c()
 rsd <- c()
 type <- c()
 evaluation <- c()
-for (sample_name in sample_names){
-  tmp <- res_twopeptides[[sample_name]]
-  number_proteins <- append(number_proteins,tmp[c(1,4,7,10,13,16),1])
-  name <- append(name,
-                 paste(tmp[c(1,4,7,10,13,16),3],"_",tmp[c(1,4,7,10,13,16),4], sep = ""))
-  conc <- c(conc, rep(sample_name,6))
-  type <- c(type, paste(tmp[c(1,4,7,10,13,16),3]))
-  evaluation <- c(evaluation, paste(tmp[c(1,4,7,10,13,16),4]))
-  rsd <- c(rsd, paste(tmp[c(1,4,7,10,13,16),2]))
-}
 
-
-res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
-colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
-res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
-res_2gether$rsd <- as.numeric(res_2gether$rsd)
-res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 6)
-
-ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Type, linetype = Evaluation )) +
-  geom_line() +
-  geom_point() + 
-  ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
-
-
-ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Type, linetype = Evaluation )) +
-  geom_line() +
-  geom_point() + 
-  ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
-
-########with all values
-sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
-number_proteins <- c()
-name <- c()
-conc <- c()
-rsd <- c()
-type <- c()
-evaluation <- c()
 for (sample_name in sample_names){
   tmp <- res_twopeptides[[sample_name]]
   number_proteins <- append(number_proteins,tmp[,1])
@@ -97,7 +62,7 @@ res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
 res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
 
-plot_no <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
+plot_no_two <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
   geom_point() + 
   ylab("Number of proteins") + 
@@ -107,7 +72,7 @@ plot_no <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash"))
 
-plot_rsd <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
+plot_rsd_two <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
   geom_point() + 
   ylab("rsd [%]") + 
@@ -116,9 +81,7 @@ plot_rsd <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, col
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash"))
 
-
-
-ggarrange(plot_no, plot_rsd, 
+ggarrange(plot_no_two, plot_rsd_two, 
           labels = c("A", "B"),
           ncol = 1, nrow = 2,
           common.legend = TRUE, legend="bottom")
@@ -130,7 +93,7 @@ ggsave(pth,
 res_2gether_twopeptides <- res_2gether
 
 ############################
-####### comparing via concentration one peptides
+####### comparing via concentration one peptide
 #############################
 res_twopeptides <- readRDS("results_onepeptide.rds")
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
@@ -140,47 +103,7 @@ conc <- c()
 rsd <- c()
 type <- c()
 evaluation <- c()
-for (sample_name in sample_names){
-  tmp <- res_twopeptides[[sample_name]]
-  number_proteins <- append(number_proteins,tmp[c(1,4,7,10,13,16),1])
-  name <- append(name,
-                 paste(tmp[c(1,4,7,10,13,16),3],"_",tmp[c(1,4,7,10,13,16),4], sep = ""))
-  conc <- c(conc, rep(sample_name,6))
-  type <- c(type, paste(tmp[c(1,4,7,10,13,16),3]))
-  evaluation <- c(evaluation, paste(tmp[c(1,4,7,10,13,16),4]))
-  rsd <- c(rsd, paste(tmp[c(1,4,7,10,13,16),2]))
-}
 
-
-res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
-colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
-res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
-res_2gether$rsd <- as.numeric(res_2gether$rsd)
-res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 6)
-
-ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Type, linetype = Evaluation )) +
-  geom_line() +
-  geom_point() + 
-  ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
-
-
-ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Type, linetype = Evaluation )) +
-  geom_line() +
-  geom_point() + 
-  ylab("Number of Proteins") + 
-  xlab("Concentration [fmol]") +
-  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
-
-########with all values
-sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
-number_proteins <- c()
-name <- c()
-conc <- c()
-rsd <- c()
-type <- c()
-evaluation <- c()
 for (sample_name in sample_names){
   tmp <- res_twopeptides[[sample_name]]
   number_proteins <- append(number_proteins,tmp[,1])
@@ -199,7 +122,7 @@ res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
 res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
 
-plot_no <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
+plot_no_one <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
   geom_point() + 
   ylab("Number of proteins") + 
@@ -210,7 +133,7 @@ plot_no <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group
   scale_linetype_manual(values=c("solid","dotted","longdash"))
 
 
-plot_rsd <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
+plot_rsd_one <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
   geom_point() + 
   ylab("rsd [%]") + 
@@ -221,7 +144,7 @@ plot_rsd <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, col
 
 
 
-ggarrange(plot_no, plot_rsd, 
+ggarrange(plot_no_one, plot_rsd_one, 
           labels = c("A", "B"),
           ncol = 1, nrow = 2,
           common.legend = TRUE, legend="bottom")
@@ -232,6 +155,18 @@ ggsave(pth,
 
 
 res_2gether_onepeptide <- res_2gether
+
+# no and rsd one and two peptides plot
+
+ggarrange(plot_no_two, plot_rsd_two, plot_no_one, plot_rsd_one, 
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2,
+          common.legend = TRUE, legend="bottom")
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd.png"
+ggsave(pth,
+       width = 7,
+       height = 7)  
+
 
 ######################## compare no human proteins 
 # should be 47
