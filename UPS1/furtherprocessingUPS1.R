@@ -45,7 +45,8 @@ mean(unique_noMBR$diffonetwo)
 
 MBR_comparison <- res_2gether_onepeptide %>% filter(str_detect(Evaluation, "^MBR"))
 noMBR <- res_2gether_onepeptide %>% filter(str_detect(Evaluation, "^noMBR"))
-
+summary(MBR_comparison$rsd)
+summary(noMBR$rsd)
 MBR_comparison$comparison <- ((MBR_comparison$NumberProteins/noMBR$NumberProteins)-1)*100
 
 plot_compMBR_one <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Type, linetype = Evaluation )) +
@@ -54,13 +55,15 @@ plot_compMBR_one <- ggplot(data=MBR_comparison, aes(x=Concentration, y=compariso
   ylab("Proportion of more proteins\nfound using MBR [%]") + 
   xlab("Concentration [fmol]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
-  scale_linetype_discrete(labels = c("manually\npooled","pooled\nMaxQuant","pooled\nMaxQuant oldversion"))
+  scale_linetype_discrete(labels = c("manually\npooled","pooled\nMaxQuant","pooled\nMaxQuant oldversion")) + 
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
 
 # two peptides
 
 MBR_comparison <- res_2gether_twopeptides %>% filter(str_detect(Evaluation, "^MBR"))
 noMBR <- res_2gether_twopeptides %>% filter(str_detect(Evaluation, "^noMBR"))
-
+summary(MBR_comparison$rsd)
+summary(noMBR$rsd)
 MBR_comparison$comparison <- ((MBR_comparison$NumberProteins/noMBR$NumberProteins)-1)*100
 
 plot_compMBR_two <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Type, linetype = Evaluation )) +
@@ -69,7 +72,8 @@ plot_compMBR_two <- ggplot(data=MBR_comparison, aes(x=Concentration, y=compariso
   ylab("Proportion of more proteins\nfound using MBR [%]") + 
   xlab("Concentration [fmol]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
-  scale_linetype_discrete(labels = c("manually\npooled","pooled\nMaxQuant","pooled\nMaxQuant oldversion"))
+  scale_linetype_discrete(labels = c("manually\npooled","pooled\nMaxQuant","pooled\nMaxQuant oldversion")) + 
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
 
 ggarrange(plot_compMBR_one, plot_compMBR_two, 
           labels = c("A", "B"),
