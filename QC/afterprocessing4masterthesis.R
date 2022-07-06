@@ -1,25 +1,19 @@
-# run first qc summary rerun one & two peptides
-p <- ggarrange(p_plot_one, p_plot_two, rsd_plot_one, rsd_plot_two, 
-               labels = c("A", "B", "C", "D"),
-               ncol = 2, nrow = 2,
+# protein identfications and rsd
+plot_one <- readRDS("plot_qc_onepeptide.rds")
+plot_two <- readRDS("plot_qc_twopeptides.rds")
+p <- ggarrange(plot_one, plot_two, 
+               ncol = 1, nrow = 2,
                common.legend = TRUE, legend="bottom")
 ggsave("../pics/QC_rerun.png",
        width = 7,
        height = 7)
 
-p <- ggarrange(p_plot_one, p_plot_two, rsd_plot_one, rsd_plot_two, 
-               labels = c("A", "B", "C", "D"),
-               ncol = 2, nrow = 2,
+# for second peptides
+plot_one <- readRDS("plot_qc_secondpeptides_onepeptide.rds")
+plot_two <- readRDS("plot_qc_secondpeptides_twopeptides.rds")
+p <- ggarrange(plot_one, plot_two, 
+               ncol = 1, nrow = 2,
                common.legend = TRUE, legend="bottom")
-ggsave("../pics/QC_rerun_secondpeptides.png",
+ggsave("../pics/QC_rerun_seconpeptides.png",
        width = 7,
        height = 7)
-
-#run first qc summary rerun one peptide
-df$rsd <- round(df$rsd,3)
-knitr::kable(df, booktabs = T, "latex")
-#run first qc summary rerun two peptides
-df$rsd <- round(df$rsd,3)
-knitr::kable(df, booktabs = T, "latex")
-
-

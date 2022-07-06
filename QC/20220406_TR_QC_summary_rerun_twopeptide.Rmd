@@ -34,6 +34,7 @@ library(reshape2) #for melting data for boxplot with ggplot
 library(pheatmap)
 library(MASS)
 library(ggpubr)
+library(RColorBrewer)
 ```
 
 
@@ -101,19 +102,20 @@ boxplot(lfq)
 apply(lfq,2,CV)
 ```
 
-# visualize no protein identifications
+
+# visualize no protein identifications and rsd
 
 ```{r}
 #plot data
 no <- c(apply(razor,2,MEAN),apply(unique,2,MEAN),apply(lfq,2,MEAN))
-
+rsd <- c(apply(razor,2,CV),apply(unique,2,CV),apply(lfq,2,CV))
 evaluation <- rep(c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"),3)
 
 type <- c("Razor","Unique","LFQ")
 type <- rep(type, each=6)
 
-df <- data.frame(no, type, evaluation)
-colnames(df) <- c("no","Type","Evaluation")
+df <- data.frame(no, type, evaluation,rsd)
+colnames(df) <- c("no","Type","Evaluation","rsd")
 
 #reorder x axis
 df$Type <- factor(df$Type,
@@ -121,65 +123,33 @@ df$Type <- factor(df$Type,
 df$Evaluation <- factor(df$Evaluation,
                                levels = c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"))
 
-p_plot_two <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
-    geom_bar(stat='identity', position='dodge') +
+mypalette_red <-brewer.pal(9,"PuRd")
+#reverse color to get the more intense for MBR
+mypalette_red <- rev(mypalette_red[c(7:9)])
+mypalette_blue <-brewer.pal(9,"PuBu")
+mypalette_blue <- rev(mypalette_blue[c(7:9)])
+
+color_manual <- rep(c(mypalette_red,mypalette_blue),3)
+
+plot <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  geom_errorbar(aes(ymin = (no-((rsd/2))*100), ymax = (no+((rsd/2))*100)),width=0.2, position = position_dodge(0.9)) +
   theme_minimal() +
-  scale_fill_brewer(palette="Dark2") +
+  scale_fill_manual(values = alpha(color_manual,0.8)) +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
   ylab("No. of protein identifications") +
-  labs(fill = "Evaluation \n method") 
-  # scale_y_break(c(100,1200)) with library(ggbreak)
-p_plot_two
+  labs(fill = "Evaluation \n method", title = "two peptides") +
+  coord_cartesian(ylim=c(1200,2000)) 
+plot
+saveRDS(plot, file = "plot_qc_twopeptides.rds")
 ```
-
-
-* type of Razor peptides: `r df$Evaluation[df$Type=="Razor"]`
-* mean of Razor peptides: `r df$no[df$Type=="Razor"]`
-* type of unique peptides: `r df$Evaluation[df$Type=="Unique"]`
-* mean of unique peptides: `r df$no[df$Type=="Unique"]`
-* type of lfq peptides: `r df$Evaluation[df$Type=="LFQ"]`
-* mean of lfq peptides: `r df$no[df$Type=="LFQ"]`
-
-Using at least two razor&unique resp unique peptide as treshhold for the data analysis it can be seen that the number of protein identifications is quite similar for type Razor and Unique independet which evaluation method is used. For LFQ the number of protein identifications is higher than for Razor resp Unique but depends on the used evaluation method. 
-Taking a closer look it can be seen that be seen that for Razor and Unique app. 6 resp 10 more proteins could be found with the newer version of MaxQuant (evaluation method MBR_pooled resp noMBR_pooled). For LFQ the option one or two razor&unique resp unique has no influence on the number and protein identification and rsd.
-Pooling the samples after protein identification/quantification manually (MBR resp no_MBR) leads to a lower number of protein identifications (40 for MBR, 55 for no_MBR using Razor or Unique). The evaluation method MBR didn't increase or decrease the number of protein idenitification significantly using type Razor and Unique. 
-
-
-# visualize rsd
 
 ```{r}
-#plot data
-rsd <- c(apply(razor,2,CV),apply(unique,2,CV),apply(lfq,2,CV))
-
-evaluation <- rep(c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"),3)
-
-type <- c("Razor","Unique","LFQ")
-type <- rep(type, each=6)
-
-df <- data.frame(no, rsd, type, evaluation)
-colnames(df) <- c("no","rsd","Type","Evaluation")
-
-#reorder x axis
-df$Type <- factor(df$Type,
-                  levels = c("Razor","Unique","LFQ"))
-df$Evaluation <- factor(df$Evaluation,
-                               levels = c("MBR_pooled","MBR_pooled_oldversion","MBR","noMBR_pooled","noMBR_pooled_oldversion","noMBR"))
-
-rsd_plot_two <- ggplot(df, aes(x=Type, y=rsd, fill=Evaluation)) +
-    geom_bar(stat='identity', position='dodge') +
-  theme_minimal() +
-  scale_fill_brewer(palette="Dark2") +
-  theme(legend.position="bottom") +
-  theme(legend.key.size = unit(0.15, 'cm')) +
-  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
-  ylab("relative sd [%]") +
-  labs(fill = "Evaluation \n method")
-rsd_plot_two
+saveRDS(df, file = "20220406_TR_QC_summary_rerun_twopeptides.rds")
 ```
 
-The relative standard deviation (rsd) depends strongly on the used evualation method. Especially using the old version leads to significant higher rsd than the newer version inpdendet if MBR is used or not. The lowest rsd could be achieved using pooling during protein identification/quantification (MBR_pooled) follwed by noMBR, noMBR_pooled and MBR independet which type was used. So no clear results could be made as to whether manual pooling or pooling during protein identification/quantification provides the lower rsd.
 
 # Relative deviations
 

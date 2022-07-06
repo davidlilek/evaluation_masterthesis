@@ -34,6 +34,7 @@ library(reshape2) #for melting data for boxplot with ggplot
 library(pheatmap)
 library(MASS)
 library(ggpubr)
+library(RColorBrewer)
 ```
 
 ```{r results="asis"}
@@ -104,90 +105,57 @@ boxplot(lfq)
 apply(lfq,2,CV)
 ```
 
-# visualize no protein identifications
+
+# visualize no protein identifications and rsd
 
 ```{r}
 #plot data
 no <- c(apply(razor,2,MEAN),apply(unique,2,MEAN),apply(lfq,2,MEAN))
-sd <- c(apply(razor,2,SD),apply(unique,2,SD),apply(lfq,2,SD))
+rsd <- c(apply(razor,2,CV),apply(unique,2,CV),apply(lfq,2,CV))
 evaluation <- rep(c("MBR_pooled","MBR_pooled_secondpeptides","noMBR_pooled","noMBR_pooled_secondpeptides"),3)
-
 type <- c("Razor","Unique","LFQ")
 type <- rep(type, each=4)
-
-df <- data.frame(no, type, evaluation,sd)
-colnames(df) <- c("no","Type","Evaluation","sd")
-
+df <- data.frame(no, rsd, type, evaluation)
+colnames(df) <- c("no","rsd","Type","Evaluation")
 #reorder x axis
 df$Type <- factor(df$Type,
                   levels = c("Razor","Unique","LFQ"))
 df$Evaluation <- factor(df$Evaluation,
                                levels = c("MBR_pooled","MBR_pooled_secondpeptides","noMBR_pooled","noMBR_pooled_secondpeptides"))
 
+mypalette_red <-brewer.pal(9,"PuRd")
+#reverse color to get the more intense for MBR
+mypalette_red <- rev(mypalette_red[c(8:9)])
+mypalette_blue <-brewer.pal(9,"PuBu")
+mypalette_blue <- rev(mypalette_blue[c(8:9)])
 
-p_plot_two <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
-    geom_bar(stat='identity', position=position_dodge()) +
+color_manual <- rep(c(mypalette_red,mypalette_blue),3)
+
+plot <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  geom_errorbar(aes(ymin = (no-((rsd/2))*100), ymax = (no+((rsd/2))*100)),width=0.2, position = position_dodge(0.9)) +
   theme_minimal() +
-  scale_fill_brewer(palette="Dark2") +
+  scale_fill_manual(values = alpha(color_manual,0.8)) +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
   ylab("No. of protein identifications") +
-  labs(fill = "Evaluation \n method") +
-  coord_cartesian(ylim=c(1200,2000))
-p_plot_two
+  labs(fill = "Evaluation \n method", title = "two peptides") +
+  coord_cartesian(ylim=c(1200,2100)) 
+plot
+saveRDS(plot, file = "plot_qc_secondpeptides_twopeptides.rds")
+```
+
+```{r}
+saveRDS(df, file = "20220406_TR_QC_summary_rerun_secondpeptides_twopeptides.rds")
 ```
 
 
-# visualize rsd
+
+# LaTeX
 
 ```{r}
-#plot data
-rsd <- c(apply(razor,2,CV),apply(unique,2,CV),apply(lfq,2,CV))
 
-evaluation <- rep(c("MBR_pooled","MBR_pooled_secondpeptides","noMBR_pooled","noMBR_pooled_secondpeptides"),3)
-
-type <- c("Razor","Unique","LFQ")
-type <- rep(type, each=4)
-
-df <- data.frame(no, rsd, type, evaluation)
-colnames(df) <- c("no","rsd","Type","Evaluation")
-
-#reorder x axis
-df$Type <- factor(df$Type,
-                  levels = c("Razor","Unique","LFQ"))
-df$Evaluation <- factor(df$Evaluation,
-                               levels = c("MBR_pooled","MBR_pooled_secondpeptides","noMBR_pooled","noMBR_pooled_secondpeptides"))
-
-rsd_plot_two <- ggplot(df, aes(x=Type, y=rsd, fill=Evaluation)) +
-    geom_bar(stat='identity', position='dodge') +
-  theme_minimal() +
-  scale_fill_brewer(palette="Dark2") +
-  theme(legend.position="bottom") +
-  theme(legend.key.size = unit(0.15, 'cm')) +
-  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
-  ylab("relative sd [%]") +
-  labs(fill = "Evaluation \n method")
-rsd_plot_two
-```
-
-
-```{r}
-saveRDS(df, file = "20220406_TR_QC_summary_rerun_twopeptide_secondpeptide.rds")
-```
-
-# Comparison one and two
-
-```{r}
-df_onepeptide <- readRDS("20220406_TR_QC_summary_rerun_onepeptide_secondpeptide.rds")
-t <- df_onepeptide$no/df$no
-tt <- (1-t[1:12])*100
-t_sd <- df_onepeptide$rsd/df$rsd
-tt_sd <- (t[1:12]-1)*100
-df_comp <- as.data.frame(cbind(tt,tt_sd))
-colnames(df_comp) <- c("Protein identification","rsd")
-boxplot(df_comp$`Protein identification`, df_comp$rsd, ylab ="Deviation one peptide vs two peptides [%]", names = colnames(df_comp))
- 
 ```
 
 # Used time
