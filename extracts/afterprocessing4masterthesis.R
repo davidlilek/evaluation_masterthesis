@@ -150,7 +150,7 @@ ggarrange(plots_no_onepeptide[[sample_name1]],plots_no_twopeptides[[sample_name1
           plots_no_onepeptide[[sample_name2]],plots_no_twopeptides[[sample_name2]], plots_rsd_onepeptide[[sample_name2]] ,plots_rsd_twopeptides[[sample_name2]], 
           labels = c("A", "B", "C", "D","a","b","c","d"),
           ncol = 2, nrow = 4,
-          common.legend = TRUE, legend="top",
+          common.legend = TRUE, legend="bottom",
           hjust = c(rep(-4.5,4),rep(-5.25,4)),
           align = "hv")
 pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_secondpeptides_compare",sample_name1,sample_name2,".png",sep="")
