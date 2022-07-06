@@ -8,6 +8,9 @@
 #(2) run 20220406_TR_extract_summary_rerun_two peptides
 
 library(ggpubr)
+library(stringr)
+library(dplyr)
+library(ggplot2)
 
 plots_no_twopeptides <- readRDS("plots_no_twopeptides.rds")
 plots_rsd_twopeptides <- readRDS("plots_rsd_twopeptides.rds")
@@ -68,67 +71,90 @@ ggsave(pth,
        width = 7,
        height = 7)  
 
-###############################################################
-#
-#  OLD STUFF
-#
-###################################
 
-# for (sample_name in sample_names){
-#   ggarrange(plots_no_twopeptides[[sample_name]], plots_rsd_twopeptides[[sample_name]], 
-#             labels = c("A", "B"),
-#             ncol = 2, nrow = 1,
-#             common.legend = TRUE, legend="bottom")
-#   pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun",sample_name,".png",sep="")
-#   ggsave(pth,
-#          width = 7,
-#          height = 7)  
-# }
-# 
-# figure <- ggarrange(plotlist=c(plots_no_twopeptides, plots_rsd_twopeptides), 
-#           labels = c(1:12),
-#           ncol = 2, nrow = 6,
-#           common.legend = TRUE, legend="bottom")
-# 
-# remove_y <- theme(
-#   axis.text.y = element_blank(),
-#   axis.ticks.y = element_blank(),
-#   axis.title.y = element_blank()
-# )
-# 
-# annotate_figure(figure,
-#                 top = text_grob("Visualizing Tooth Growth", color = "red", face = "bold", size = 14),
-#                 bottom = text_grob("Data source: \n ToothGrowth data set", color = "blue",
-#                                    hjust = 1, x = 1, face = "italic", size = 10),
-#                 left = text_grob("Figure arranged using ggpubr", color = "green", rot = 90),
-#                 right = text_grob(bquote("Superscript: ("*kg~NH[3]~ha^-1~yr^-1*")"), rot = 90),
-#                 fig.lab = "Figure 1", fig.lab.face = "bold"
-# )
-# 
-# 
-# pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_try.png"
-# ggsave(pth,
-#        width = 14,
-#        height = 14)  
-# 
-# 
-# 
-# 
-# 
-# # run first qc summary rerun one & two peptides
-# p <- ggarrange(p_plot_one, p_plot_two, rsd_plot_one, rsd_plot_two, 
-#                labels = c("A", "B", "C", "D"),
-#                ncol = 2, nrow = 2,
-#                common.legend = TRUE, legend="bottom")
-# ggsave("../pics/extracts_rerun.png",
-#        width = 7,
-#        height = 7)
-# 
-# #run first qc summary rerun one peptide
-# df$rsd <- round(df$rsd,3)
-# knitr::kable(df, booktabs = T, "latex")
-# #run first qc summary rerun two peptides
-# df$rsd <- round(df$rsd,3)
-# knitr::kable(df, booktabs = T, "latex")
-# 
-# 
+
+################# compare MBR no MBR
+
+# one peptide
+sample_names <- LETTERS[1:6]
+res_2gether_onepeptide <- readRDS("results_onepeptide.rds")
+res_2gether_onepeptide <- as.data.frame(do.call(rbind,res_2gether_onepeptide))
+res_2gether_onepeptide$sample_name <- rep(sample_names,each=18)
+
+MBR_comparison <- res_2gether_onepeptide %>% filter(str_detect(Evaluation, "^MBR"))
+noMBR <- res_2gether_onepeptide %>% filter(str_detect(Evaluation, "^noMBR"))
+summary(MBR_comparison$rsd)
+summary(noMBR$rsd)
+MBR_comparison$comparison <- ((MBR_comparison$no/noMBR$no)-1)*100
+MBR_comparison_onepeptide <- MBR_comparison
+
+# two peptides
+res_2gether_twopeptides <- readRDS("results_twopeptides.rds")
+res_2gether_twopeptides <- as.data.frame(do.call(rbind,res_2gether_twopeptides))
+res_2gether_twopeptides$sample_name <- rep(sample_names,each=18)
+
+MBR_comparison <- res_2gether_twopeptides %>% filter(str_detect(Evaluation, "^MBR"))
+noMBR <- res_2gether_twopeptides %>% filter(str_detect(Evaluation, "^noMBR"))
+summary(MBR_comparison$rsd)
+summary(noMBR$rsd)
+MBR_comparison$comparison <- ((MBR_comparison$no/noMBR$no)-1)*100
+MBR_comparison_twopeptides <- MBR_comparison
+
+
+# bring the 2gether
+MBR_comparison <- rbind(MBR_comparison_onepeptide,MBR_comparison_twopeptides)
+MBR_comparison$peptides <- rep(c("one","two"),each=54)
+
+
+ ggplot(MBR_comparison, aes(x=Type, y=comparison, color=Evaluation)) +
+  geom_boxplot() +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("Proportion of more proteins\nfound using MBR [%]") +
+  labs(fill = "Evaluation \n method") + 
+  facet_wrap(~sample_name, ncol=2) +
+  scale_fill_brewer(palette="Dark2", labels = c("pooled\nMaxQuant","pooled\nMaxQuant oldversion","manually\npooled","manually\npooled")) 
+
+ 
+ p_plot_one
+p_plot_one <- ggplot(MBR_comparison, aes(x=Type, y=comparison, fill=Evaluation)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2", labels = c("pooled\nMaxQuant","pooled\nMaxQuant oldversion","manually\npooled","manually\npooled")) +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("Proportion of more proteins\nfound using MBR [%]") +
+  labs(fill = "Evaluation \n method") 
+
+p_plot_one
+
+
+
+
+
+p_plot_two <- ggplot(MBR_comparison, aes(x=Type, y=comparison, fill=Evaluation)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2", labels = c("pooled\nMaxQuant","pooled\nMaxQuant oldversion","manually\npooled","manually\npooled")) +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("Proportion of more proteins\nfound using MBR [%]") +
+  labs(fill = "Evaluation \n method")
+
+p_plot_two
+
+
+# mbr no mbr
+ggarrange(
+          labels = c("A", "B"),
+          ncol = 2, nrow = 4,
+          common.legend = TRUE, legend="top",
+          hjust = c(rep(-4.5,4),rep(-5.25,4)),
+          align = "hv")
+pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_secondpeptides_compare",sample_name1,sample_name2,".png",sep="")
+ggsave(pth,
+       width = 7,
+       height = 7) 

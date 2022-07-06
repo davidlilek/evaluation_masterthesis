@@ -50,6 +50,7 @@ path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthes
 ##########read in all data with pattern .txt
 # get file list
 file.list <- list.files(path = path, pattern='*.csv')
+file.list <- file.list[-c(3,7)]
 # create file path
 file.path <- paste(path,file.list,sep = "")
 # read in files - for each file one variable is created - results are stored in a list
@@ -85,6 +86,7 @@ col_names <- c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR
 ```{r, results="asis"}
 plots_no_onepeptide <- list()
 plots_rsd_onepeptide <- list()
+result_df <- list()
 for (sample_name in sample_names){
   cat("\n")
   cat("#",sample_name,"\n")
@@ -157,6 +159,8 @@ for (sample_name in sample_names){
     
     plots_no_onepeptide[[sample_name]] <- p_plot_two
     plots_rsd_onepeptide[[sample_name]] <- rsd_plot_two
+    result_df[[sample_name]] <- df
+    
     
 }
 ```
@@ -165,7 +169,7 @@ for (sample_name in sample_names){
 ```{r}
 saveRDS(plots_no_onepeptide, file = "plots_no_onepeptide.rds")
 saveRDS(plots_rsd_onepeptide, file = "plots_rsd_onepeptide.rds")
-saveRDS(df, file = "results_onepeptide.rds")
+saveRDS(result_df, file = "results_onepeptide.rds")
 ```
 
 
