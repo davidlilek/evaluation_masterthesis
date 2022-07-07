@@ -14,6 +14,7 @@ plot_two <- readRDS("plot_qc_secondpeptides_twopeptides.rds")
 p <- ggarrange(plot_one, plot_two, 
                ncol = 1, nrow = 2,
                common.legend = TRUE, legend="bottom")
-ggsave("../pics/QC_rerun_seconpeptides.png",
+ggsave("../pics/QC_rerun_secondpeptides.png",
        width = 7,
        height = 7)
+

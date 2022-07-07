@@ -8,7 +8,24 @@ library(ggpubr)
 library(stringr)
 library(dplyr)
 library(ggplot2)
+library(reshape)
+library(reshape2)
+library(RColorBrewer)
 
+###########################
+#
+#
+# load color palette
+#
+#
+###########################
+
+mypalette_red <-brewer.pal(9,"PuRd")
+#reverse color to get the more intense for MBR
+mypalette_red <- rev(mypalette_red[c(7:9)])
+mypalette_blue <-brewer.pal(9,"PuBu")
+mypalette_blue <- rev(mypalette_blue[c(7:9)])
+color_manual <- rep(c(mypalette_red,mypalette_blue),3)
 
 ############################
 #
@@ -167,7 +184,7 @@ ggsave(pth,
 ############################
 
 # load and arrange data for one peptide
-sample_names <- LETTERS[1:6]
+sample_names <- paste("Extract",LETTERS[1:6],sep=" ")
 res_2gether_onepeptide <- readRDS("results_onepeptide.rds")
 res_2gether_onepeptide <- as.data.frame(do.call(rbind,res_2gether_onepeptide))
 res_2gether_onepeptide$sample_name <- rep(sample_names,each=18)
@@ -216,3 +233,38 @@ pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_mast
 ggsave(pth,
        width = 7,
        height = 7) 
+
+#################
+#
+# compare one and two peptides
+#
+################
+
+one <- readRDS("results_onepeptide.rds")
+two <- readRDS("results_twopeptides.RDS")
+
+one <- as.data.frame(one)
+two <- as.data.frame(two)
+
+diff_one_two <- ((one/two)-1)*100
+diff_one_two <- diff_one_two[,grepl("no",colnames(diff_one_two))]
+diff_one_two$Type <- one$X_A.Type
+diff_one_two$Evaluation <- one$X_A.Evaluation
+
+diff_4plot <- melt(diff_one_two[-c(13:18),])
+diff_4plot$extract <-paste(rep("Extract",each=12),rep(LETTERS[1:6],each=12),sep=" ")
+
+diff_4plot$Evaluation <- factor(diff_4plot$Evaluation,
+                                                 levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
+
+ggplot(diff_4plot, aes(x=Type, y=value, color=Evaluation)) +
+  geom_point(position = dodge, size = 2.5) +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("Proportion of more proteins\nfound using MBR [%]") +
+  labs(fill = "Evaluation \n method") +
+  facet_wrap(~extract) + 
+  scale_color_manual(values = color_manual) + 
+  scale_alpha(0.8)
+  
