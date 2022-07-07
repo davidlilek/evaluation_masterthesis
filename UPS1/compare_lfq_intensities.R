@@ -29,6 +29,8 @@ path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthes
 ##########read in all data with pattern .txt
 # get file list
 file.list <- list.files(path = path, pattern='*.rds')
+# remove second peptides
+file.list <- file.list[-c(3,6)]
 # create file path
 file.path <- paste(path,file.list,sep = "")
 # read in files - for each file one variable is created - results are stored in a list

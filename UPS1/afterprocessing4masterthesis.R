@@ -346,4 +346,166 @@ ggsave(pth,
        height = 7)  
 
 
-  
+
+#####################################################
+#
+# second peptides
+#
+#####################################################
+
+# load plots
+
+plots_no_twopeptides <- readRDS("plots_no_secondpeptides_twopeptides.rds")
+plots_rsd_twopeptides <- readRDS("plots_rsd_secondpeptides_twopeptides.rds")
+plots_no_onepeptide <- readRDS("plots_no_secondpeptides_onepeptide.rds")
+plots_rsd_onepeptide <- readRDS("plots_rsd_secondpeptides_onepeptide.rds")
+sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
+
+
+# create single plots for each concentration
+
+
+for (sample_name in sample_names){
+  ggarrange(plots_no_onepeptide[[sample_name]],plots_no_twopeptides[[sample_name]], plots_rsd_onepeptide[[sample_name]] ,plots_rsd_twopeptides[[sample_name]], 
+            labels = c("A", "B", "C", "D"),
+            ncol = 2, nrow = 2,
+            common.legend = TRUE, legend="bottom")
+  pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/UPS1_rerun_secondpeptides",sample_name,".png",sep="")
+  ggsave(pth,
+         width = 7,
+         height = 7)  
+}
+
+####### comparing via concentration two peptides
+
+res_twopeptides <- readRDS("results_secondpeptides_twopeptides.rds")
+sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
+number_proteins <- c()
+name <- c()
+conc <- c()
+rsd <- c()
+type <- c()
+evaluation <- c()
+
+for (sample_name in sample_names){
+  tmp <- res_twopeptides[[sample_name]]
+  number_proteins <- append(number_proteins,tmp[,1])
+  name <- append(name,
+                 paste(tmp[,3],"_",tmp[,4], sep = ""))
+  conc <- c(conc, rep(sample_name,6))
+  type <- c(type, paste(tmp[,3]))
+  evaluation <- c(evaluation, paste(tmp[,4]))
+  rsd <- c(rsd, paste(tmp[,2]))
+}
+
+
+res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
+colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
+res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
+res_2gether$rsd <- as.numeric(res_2gether$rsd)
+res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 12)
+
+plot_no_two <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
+  geom_line() +
+  geom_point() + 
+  ylab("Number of proteins") + 
+  xlab("Concentration [fmol]") +
+  scale_fill_brewer(palette="Dark2") +
+  labs(color = "Evaluation \n method") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
+
+plot_rsd_two <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
+  geom_line() +
+  geom_point() + 
+  ylab("rsd [%]") + 
+  xlab("Concentration [fmol]") +
+  labs(color = "Evaluation \n method") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
+
+ggarrange(plot_no_two, plot_rsd_two, 
+          labels = c("A", "B"),
+          ncol = 1, nrow = 2,
+          common.legend = TRUE, legend="bottom")
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd_twopeptides_secondpeptides.png"
+ggsave(pth,
+       width = 7,
+       height = 7)  
+
+res_2gether_twopeptides <- res_2gether
+
+############################
+####### comparing via concentration one peptide
+#############################
+res_twopeptides <- readRDS("results_secondpeptides_onepeptide.rds")
+sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
+number_proteins <- c()
+name <- c()
+conc <- c()
+rsd <- c()
+type <- c()
+evaluation <- c()
+
+for (sample_name in sample_names){
+  tmp <- res_twopeptides[[sample_name]]
+  number_proteins <- append(number_proteins,tmp[,1])
+  name <- append(name,
+                 paste(tmp[,3],"_",tmp[,4], sep = ""))
+  conc <- c(conc, rep(sample_name,6))
+  type <- c(type, paste(tmp[,3]))
+  evaluation <- c(evaluation, paste(tmp[,4]))
+  rsd <- c(rsd, paste(tmp[,2]))
+}
+
+
+res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
+colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
+res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
+res_2gether$rsd <- as.numeric(res_2gether$rsd)
+res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 12)
+
+plot_no_one <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
+  geom_line() +
+  geom_point() + 
+  ylab("Number of proteins") + 
+  xlab("Concentration [fmol]") +
+  scale_fill_brewer(palette="Dark2") +
+  labs(color = "Evaluation \n method") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) + 
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
+
+
+plot_rsd_one <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
+  geom_line() +
+  geom_point() + 
+  ylab("rsd [%]") + 
+  xlab("Concentration [fmol]") +
+  labs(color = "Evaluation \n method") +
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
+  scale_linetype_manual(values=c("solid","dotted","longdash"))
+
+
+
+ggarrange(plot_no_one, plot_rsd_one, 
+          labels = c("A", "B"),
+          ncol = 1, nrow = 2,
+          common.legend = TRUE, legend="bottom")
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd_onepeptide_secondpeptides.png"
+ggsave(pth,
+       width = 7,
+       height = 7)  
+
+
+res_2gether_onepeptide <- res_2gether
+
+# no and rsd one and two peptides plot
+
+ggarrange(plot_no_two, plot_rsd_two, plot_no_one, plot_rsd_one, 
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2,
+          common.legend = TRUE, legend="bottom")
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd_secondpeptides.png"
+ggsave(pth,
+       width = 7,
+       height = 7)  

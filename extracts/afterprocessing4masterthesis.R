@@ -240,6 +240,8 @@ ggsave(pth,
 #
 ################
 
+# number of proteins
+
 one <- readRDS("results_onepeptide.rds")
 two <- readRDS("results_twopeptides.RDS")
 
@@ -257,14 +259,58 @@ diff_4plot$extract <-paste(rep("Extract",each=12),rep(LETTERS[1:6],each=12),sep=
 diff_4plot$Evaluation <- factor(diff_4plot$Evaluation,
                                                  levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
 
-ggplot(diff_4plot, aes(x=Type, y=value, color=Evaluation)) +
+plot_peptides <- ggplot(diff_4plot, aes(x=Type, y=value, color=Evaluation)) +
   geom_point(position = dodge, size = 2.5) +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
-  ylab("Proportion of more proteins\nfound using MBR [%]") +
+  ylab("Deviation one vs. two peptides [%]") +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~extract) + 
   scale_color_manual(values = color_manual) + 
   scale_alpha(0.8)
   
+plot_peptides
+
+pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_comparison_onetwopeptides_noproteins.png")
+
+ggsave(pth,
+       width = 7,
+       height = 7) 
+
+
+
+one <- readRDS("results_onepeptide.rds")
+two <- readRDS("results_twopeptides.RDS")
+
+one <- as.data.frame(one)
+two <- as.data.frame(two)
+
+diff_one_two <- ((one/two)-1)*100
+diff_one_two <- diff_one_two[,grepl("rsd",colnames(diff_one_two))]
+diff_one_two$Type <- one$X_A.Type
+diff_one_two$Evaluation <- one$X_A.Evaluation
+
+diff_4plot <- melt(diff_one_two[-c(13:18),])
+diff_4plot$extract <-paste(rep("Extract",each=12),rep(LETTERS[1:6],each=12),sep=" ")
+
+diff_4plot$Evaluation <- factor(diff_4plot$Evaluation,
+                                levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
+
+plot_peptides <- ggplot(diff_4plot, aes(x=Type, y=value, color=Evaluation)) +
+  geom_point(position = dodge, size = 2.5) +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("Deviation one vs. two peptides [%]") +
+  labs(fill = "Evaluation \n method") +
+  facet_wrap(~extract) + 
+  scale_color_manual(values = color_manual) + 
+  scale_alpha(0.8)
+
+plot_peptides
+
+pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_comparison_onetwopeptides_rsd.png")
+ggsave(pth,
+       width = 7,
+       height = 7) 

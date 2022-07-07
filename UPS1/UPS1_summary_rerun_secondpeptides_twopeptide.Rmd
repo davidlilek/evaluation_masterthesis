@@ -50,8 +50,8 @@ path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthes
 ##########read in all data with pattern .txt
 # get file list
 file.list <- list.files(path = path, pattern='*.csv')
-# remove second peptides
-file.list <- file.list[-c(3,7)]
+# remove manually pooling and oldversion
+file.list <- file.list[-c(2,4,6,8)]
 # create file path
 file.path <- paste(path,file.list,sep = "")
 # read in files - for each file one variable is created - results are stored in a list
@@ -80,7 +80,7 @@ MEAN <- function(x){
 ```{r}
 #set sample name
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
-col_names <- c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR")
+col_names <- c("MBR_pooled","MBR_pooled\nsecondpeptides","noMBR_pooled","noMBR_pooled\nsecondpeptides")
 ```
 
 
@@ -129,7 +129,7 @@ for (sample_name in sample_names){
   df$Type <- factor(df$Type,
                     levels = c("Razor","Unique","LFQ"))
   df$Evaluation <- factor(df$Evaluation,
-                                 levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
+                                 levels = c("MBR_pooled","MBR_pooled\nsecondpeptides","noMBR_pooled","noMBR_pooled\nsecondpeptides"))
   p_plot_two <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
       geom_bar(stat='identity', position='dodge') +
     theme_minimal() +
@@ -165,21 +165,11 @@ for (sample_name in sample_names){
 ```
 
 ```{r}
-saveRDS(plots_no_twopeptides, file = "plots_no_twopeptides.rds")
-saveRDS(plots_rsd_twopeptides, file = "plots_rsd_twopeptides.rds")
-saveRDS(res_df, file = "results_twopeptides.rds")
+saveRDS(plots_no_twopeptides, file = "plots_no_secondpeptides_twopeptides.rds")
+saveRDS(plots_rsd_twopeptides, file = "plots_rsd_secondpeptides_twopeptides.rds")
+saveRDS(res_df, file = "results_secondpeptides_twopeptides.rds")
 ```
 
-```{r eval=FALSE, include=FALSE}
-df_onepeptide <- readRDS("20220406_TR_QC_summary_rerun_onepeptide.rds")
-t <- df_onepeptide$no/df$no
-tt <- (1-t[1:12])*100
-t_sd <- df_onepeptide$rsd/df$rsd
-tt_sd <- (t[1:12]-1)*100
-df_comp <- as.data.frame(cbind(tt,tt_sd))
-colnames(df_comp) <- c("Protein identification","rsd")
-boxplot(df_comp$`Protein identification`, df_comp$rsd, ylab ="Deviation one peptide vs two peptides [%]", names = colnames(df_comp))
-```
 # LaTeX
 
 ```{r}
