@@ -314,3 +314,116 @@ pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_mast
 ggsave(pth,
        width = 7,
        height = 7) 
+
+###########################################
+#
+# visualize difference secondpeptides
+#
+###########################################
+
+# number of proteins
+
+one_raw <- as.data.frame(readRDS("results_secondpeptides_onepeptide.rds"))
+two_raw <- as.data.frame(readRDS("results_seconpeptides_twopeptides.rds"))
+
+one <- one_raw
+two <- two_raw
+
+one <- one[,grepl("no",colnames(one))]
+two <- two[,grepl("no",colnames(two))]
+
+one_diff <- t(data.frame(((one[2,]/one[1,])-1)*100, # 6x mbr 6x razor 6xone
+                         ((one[4,]/one[3,])-1)*100,            # 6x no MBR 6x razor 5x one
+                         ((one[6,]/one[5,])-1)*100,            # 6x  MBR 6x unique 5x one
+                         ((one[8,]/one[7,])-1)*100,            # 5x  no MBR 6x unique 5x one
+                         ((one[10,]/one[9,])-1)*100,            # 5x MBR 6x lfq 5x one
+                         ((one[12,]/one[11,])-1)*100))            # 5x no MBR 6x lfq 5x one
+
+two_diff <-  t(data.frame(
+  (((two[2,]/two[1,])-1)*100),
+  (((two[4,]/two[3,])-1)*100),
+  (((two[6,]/two[5,])-1)*100),
+  (((two[8,]/two[7,])-1)*100),
+  (((two[10,]/two[9,])-1)*100),
+  (((two[12,]/two[11,])-1)*100)))
+
+compare_secondpeptides <- as.data.frame(rbind(one_diff,two_diff))
+colnames(compare_secondpeptides) <-c("results")
+compare_secondpeptides$number <- rep(c("one","two"),each = 36)
+compare_secondpeptides$MBR <- rep(rep(c("MBR","no_MBR"),each = 6),6)
+compare_secondpeptides$Type <- rep(rep(c("Razor","Unique","LFQ"), each = 12),2)
+compare_secondpeptides$Concentration <- as.factor(rep(c("A","B","C","D","E","F"), 12))
+compare_secondpeptides$shapes <- paste(compare_secondpeptides$MBR,compare_secondpeptides$number
+                                       ,sep="_")
+
+compare_secondpeptides$Type <- factor(compare_secondpeptides$Type,
+                                      levels = c("Razor", "Unique", "LFQ"))
+
+dodge <- position_dodge(.3)
+
+ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=MBR)) +
+  geom_point(position = dodge, size = 3, aes(shape = shapes)) +
+  scale_shape_manual(values=c(1, 16, 2, 17)) +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("Deviation using second pepitdes [%]") +
+  xlab("Concentration[fmol]") +
+  labs(fill = "Evaluation \n method") +
+  facet_wrap(~Type, ncol = 1) +
+  scale_color_manual(values = c(mypalette_red[1],mypalette_blue[1])) + 
+  scale_alpha(0.8)
+
+# rsd
+
+one_raw <- as.data.frame(readRDS("results_secondpeptides_onepeptide.rds"))
+two_raw <- as.data.frame(readRDS("results_seconpeptides_twopeptides.rds"))
+
+one <- one_raw
+two <- two_raw
+
+one <- one[,grepl("rsd",colnames(one))]
+two <- two[,grepl("rsd",colnames(two))]
+
+one_diff <- t(data.frame(((one[2,]/one[1,])-1)*100, # 6x mbr 6x razor 6xone
+                         ((one[4,]/one[3,])-1)*100,            # 6x no MBR 6x razor 5x one
+                         ((one[6,]/one[5,])-1)*100,            # 6x  MBR 6x unique 5x one
+                         ((one[8,]/one[7,])-1)*100,            # 5x  no MBR 6x unique 5x one
+                         ((one[10,]/one[9,])-1)*100,            # 5x MBR 6x lfq 5x one
+                         ((one[12,]/one[11,])-1)*100))            # 5x no MBR 6x lfq 5x one
+
+two_diff <-  t(data.frame(
+  (((two[2,]/two[1,])-1)*100),
+  (((two[4,]/two[3,])-1)*100),
+  (((two[6,]/two[5,])-1)*100),
+  (((two[8,]/two[7,])-1)*100),
+  (((two[10,]/two[9,])-1)*100),
+  (((two[12,]/two[11,])-1)*100)))
+
+compare_secondpeptides <- as.data.frame(rbind(one_diff,two_diff))
+colnames(compare_secondpeptides) <-c("results")
+compare_secondpeptides$number <- rep(c("one","two"),each = 36)
+compare_secondpeptides$MBR <- rep(rep(c("MBR","no_MBR"),each = 6),6)
+compare_secondpeptides$Type <- rep(rep(c("Razor","Unique","LFQ"), each = 12),2)
+compare_secondpeptides$Concentration <- as.factor(rep(c("A","B","C","D","E","F"), 12))
+compare_secondpeptides$shapes <- paste(compare_secondpeptides$MBR,compare_secondpeptides$number
+                                       ,sep="_")
+
+compare_secondpeptides$Type <- factor(compare_secondpeptides$Type,
+                                      levels = c("Razor", "Unique", "LFQ"))
+
+dodge <- position_dodge(.3)
+
+ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=MBR)) +
+  geom_point(position = dodge, size = 3, aes(shape = shapes)) +
+  scale_shape_manual(values=c(1, 16, 2, 17)) +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  ylab("Deviation using second pepitdes [%]") +
+  xlab("Concentration[fmol]") +
+  labs(fill = "Evaluation \n method") +
+  facet_wrap(~Type, ncol = 1) +
+  scale_color_manual(values = c(mypalette_red[1],mypalette_blue[1])) + 
+  scale_alpha(0.8)
+

@@ -86,6 +86,7 @@ col_names <- c("MBR_pooled","MBR_pooled\nsecondpeptides","noMBR_pooled","noMBR_p
 ```{r, results="asis"}
 plots_no_twopeptides <- list()
 plots_rsd_twopeptides <- list()
+results_two <- list()
 for (sample_name in sample_names){
   cat("\n")
   cat("#",sample_name,"\n")
@@ -158,14 +159,14 @@ for (sample_name in sample_names){
     
     plots_no_twopeptides[[sample_name]] <- p_plot_two
     plots_rsd_twopeptides[[sample_name]] <- rsd_plot_two
-    
+    results_two[[sample_name]] <- df
 }
 ```
 
 ```{r}
 saveRDS(plots_no_twopeptides, file = "plots_no_secondpeptides_twopeptides.rds")
 saveRDS(plots_rsd_twopeptides, file = "plots_rsd_secondpeptides_twopeptides.rds")
-saveRDS(df, file = "results_seconpeptides_twopeptides.rds")
+saveRDS(results_two, file = "results_seconpeptides_twopeptides.rds")
 ```
 
 ```{r eval=FALSE, include=FALSE}
