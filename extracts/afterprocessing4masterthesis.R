@@ -11,6 +11,8 @@ library(ggplot2)
 library(reshape)
 library(reshape2)
 library(RColorBrewer)
+library(grid)
+library(gridExtra)
 
 ###########################
 #
@@ -32,19 +34,16 @@ color_manual <- rep(c(mypalette_red,mypalette_blue),3)
 # plots for base evaluation
 #
 ############################
-plots_no_twopeptides <- readRDS("plots_no_twopeptides.rds")
-plots_rsd_twopeptides <- readRDS("plots_rsd_twopeptides.rds")
-plots_no_onepeptide <- readRDS("plots_no_onepeptide.rds")
-plots_rsd_onepeptide <- readRDS("plots_rsd_onepeptide.rds")
+plots_no_twopeptides <- readRDS("plots_twopeptides.rds")
+plots_no_onepeptide <- readRDS("plots_onepeptide.rds")
 sample_names <- c("_A","_B","_C","_D","_E","_F")
 
 
 
 
 for (sample_name in sample_names){
-  ggarrange(plots_no_onepeptide[[sample_name]],plots_no_twopeptides[[sample_name]], plots_rsd_onepeptide[[sample_name]] ,plots_rsd_twopeptides[[sample_name]], 
-            labels = c("A", "B", "C", "D"),
-            ncol = 2, nrow = 2,
+  ggarrange(plots_onepeptide[[sample_name]],plots_twopeptides[[sample_name]],
+            ncol = 1, nrow = 2,
             common.legend = TRUE, legend="bottom")
   pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun",sample_name,".png",sep="")
   ggsave(pth,
@@ -56,13 +55,15 @@ for (sample_name in sample_names){
 
 sample_name1 <- "_A"
 sample_name2 <- "_B"
-ggarrange(plots_no_onepeptide[[sample_name1]],plots_no_twopeptides[[sample_name1]], plots_rsd_onepeptide[[sample_name1]] ,plots_rsd_twopeptides[[sample_name1]], 
-          plots_no_onepeptide[[sample_name2]],plots_no_twopeptides[[sample_name2]], plots_rsd_onepeptide[[sample_name2]] ,plots_rsd_twopeptides[[sample_name2]], 
-          labels = c("A", "B", "C", "D","a","b","c","d"),
-          ncol = 2, nrow = 4,
+p <- ggarrange(plots_no_onepeptide[[sample_name1]]+rremove("ylab"),plots_no_twopeptides[[sample_name1]]+rremove("ylab"), 
+          plots_no_onepeptide[[sample_name2]]+rremove("ylab"),plots_no_twopeptides[[sample_name2]]+rremove("ylab"), 
+          labels = c("- Extract A", "- Extract A", "- Extract B", "- Extract B"),
+          ncol = 2, nrow = 2,
           common.legend = TRUE, legend="bottom",
-          hjust = c(rep(-4.5,4),rep(-5.25,4)),
-          align = "hv")
+          hjust = c(-1.6,-1.7,-1.6,-1.7),
+          align = "hv",
+          font.label = list(size = 14, color = "black", face = "plain"))
+annotate_figure(p, left = textGrob("No of protein identifications", rot = 90, hjust = 0.25, vjust = 1, gp = gpar(cex = 1.0)))
 pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_compare",sample_name1,sample_name2,".png",sep="")
 ggsave(pth,
        width = 7,
@@ -72,110 +73,37 @@ ggsave(pth,
 
 sample_name1 <- "_C"
 sample_name2 <- "_D"
-ggarrange(plots_no_onepeptide[[sample_name1]],plots_no_twopeptides[[sample_name1]], plots_rsd_onepeptide[[sample_name1]] ,plots_rsd_twopeptides[[sample_name1]], 
-          plots_no_onepeptide[[sample_name2]],plots_no_twopeptides[[sample_name2]], plots_rsd_onepeptide[[sample_name2]] ,plots_rsd_twopeptides[[sample_name2]], 
-          labels = c("A", "B", "C", "D","a","b","c","d"),
-          ncol = 2, nrow = 4,
-          common.legend = TRUE, legend="bottom",
-          hjust = c(rep(-4.5,4),rep(-5.25,4)),
-          align = "hv")
+p <- ggarrange(plots_no_onepeptide[[sample_name1]]+rremove("ylab"),plots_no_twopeptides[[sample_name1]]+rremove("ylab"), 
+               plots_no_onepeptide[[sample_name2]]+rremove("ylab"),plots_no_twopeptides[[sample_name2]]+rremove("ylab"), 
+               labels = c("- Extract A", "- Extract A", "- Extract B", "- Extract B"),
+               ncol = 2, nrow = 2,
+               common.legend = TRUE, legend="bottom",
+               hjust = c(-1.6,-1.7,-1.6,-1.7),
+               align = "hv",
+               font.label = list(size = 14, color = "black", face = "plain"))
+annotate_figure(p, left = textGrob("No of protein identifications", rot = 90, hjust = 0.25, vjust = 1, gp = gpar(cex = 1.0)))
 pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_compare",sample_name1,sample_name2,".png",sep="")
-ggsave(pth,
-       width = 7,
-       height = 7)  
-
-### combine E-F
-
-sample_name1 <- "_E"
-sample_name2 <- "_F"
-ggarrange(plots_no_onepeptide[[sample_name1]],plots_no_twopeptides[[sample_name1]], plots_rsd_onepeptide[[sample_name1]] ,plots_rsd_twopeptides[[sample_name1]], 
-          plots_no_onepeptide[[sample_name2]],plots_no_twopeptides[[sample_name2]], plots_rsd_onepeptide[[sample_name2]] ,plots_rsd_twopeptides[[sample_name2]], 
-          labels = c("A", "B", "C", "D","a","b","c","d"),
-          ncol = 2, nrow = 4,
-          common.legend = TRUE, legend="bottom",
-          hjust = c(rep(-4.5,4),rep(-5.25,4)),
-          align = "hv")
-pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_compare",sample_name1,sample_name2,".png",sep="")
-ggsave(pth,
-       width = 7,
-       height = 7)  
-
-
-
-############################
-#
-# plots for second peptides
-#
-############################
-
-plots_no_twopeptides <- readRDS("plots_no_secondpeptides_twopeptides.rds")
-plots_rsd_twopeptides <- readRDS("plots_rsd_secondpeptides_twopeptides.rds")
-plots_no_onepeptide <- readRDS("plots_no_secondpeptides_onepeptide.rds")
-plots_rsd_onepeptide <- readRDS("plots_rsd_secondpeptides_onepeptide.rds")
-sample_names <- c("_A","_B","_C","_D","_E","_F")
-
-
-for (sample_name in sample_names){
-  ggarrange(plots_no_onepeptide[[sample_name]],plots_no_twopeptides[[sample_name]], plots_rsd_onepeptide[[sample_name]] ,plots_rsd_twopeptides[[sample_name]], 
-            labels = c("A", "B", "C", "D"),
-            ncol = 2, nrow = 2,
-            common.legend = TRUE, legend="bottom")
-  pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_secondpeptides",sample_name,".png",sep="")
-  ggsave(pth,
-         width = 7,
-         height = 7)  
-}
-
-
-### combine A-B
-
-sample_name1 <- "_A"
-sample_name2 <- "_B"
-ggarrange(plots_no_onepeptide[[sample_name1]],plots_no_twopeptides[[sample_name1]], plots_rsd_onepeptide[[sample_name1]] ,plots_rsd_twopeptides[[sample_name1]], 
-          plots_no_onepeptide[[sample_name2]],plots_no_twopeptides[[sample_name2]], plots_rsd_onepeptide[[sample_name2]] ,plots_rsd_twopeptides[[sample_name2]], 
-          labels = c("A", "B", "C", "D","a","b","c","d"),
-          ncol = 2, nrow = 4,
-          common.legend = TRUE, legend="bottom",
-          hjust = c(rep(-4.5,4),rep(-5.25,4)),
-          align = "hv")
-pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_secondpeptides_compare",sample_name1,sample_name2,".png",sep="")
-ggsave(pth,
-       width = 7,
-       height = 7)  
-
-### combine C-D
-
-sample_name1 <- "_C"
-sample_name2 <- "_D"
-ggarrange(plots_no_onepeptide[[sample_name1]],plots_no_twopeptides[[sample_name1]], plots_rsd_onepeptide[[sample_name1]] ,plots_rsd_twopeptides[[sample_name1]], 
-          plots_no_onepeptide[[sample_name2]],plots_no_twopeptides[[sample_name2]], plots_rsd_onepeptide[[sample_name2]] ,plots_rsd_twopeptides[[sample_name2]], 
-          labels = c("A", "B", "C", "D","a","b","c","d"),
-          ncol = 2, nrow = 4,
-          common.legend = TRUE, legend="bottom",
-          hjust = c(rep(-4.5,4),rep(-5.25,4)),
-          align = "hv")
-pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_secondpeptides_compare",sample_name1,sample_name2,".png",sep="")
-ggsave(pth,
-       width = 7,
-       height = 7)  
-
-### combine E-F
-
-sample_name1 <- "_E"
-sample_name2 <- "_F"
-ggarrange(plots_no_onepeptide[[sample_name1]],plots_no_twopeptides[[sample_name1]], plots_rsd_onepeptide[[sample_name1]] ,plots_rsd_twopeptides[[sample_name1]], 
-          plots_no_onepeptide[[sample_name2]],plots_no_twopeptides[[sample_name2]], plots_rsd_onepeptide[[sample_name2]] ,plots_rsd_twopeptides[[sample_name2]], 
-          labels = c("A", "B", "C", "D","a","b","c","d"),
-          ncol = 2, nrow = 4,
-          common.legend = TRUE, legend="bottom",
-          hjust = c(rep(-4.5,4),rep(-5.25,4)),
-          align = "hv")
-pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_secondpeptides_compare",sample_name1,sample_name2,".png",sep="")
 ggsave(pth,
        width = 7,
        height = 7) 
 
+### combine E-F
 
+sample_name1 <- "_E"
+sample_name2 <- "_F"
+p <- ggarrange(plots_no_onepeptide[[sample_name1]]+rremove("ylab"),plots_no_twopeptides[[sample_name1]]+rremove("ylab"), 
+               plots_no_onepeptide[[sample_name2]]+rremove("ylab"),plots_no_twopeptides[[sample_name2]]+rremove("ylab"), 
+               labels = c("- Extract E", "- Extract E", "- Extract F", "- Extract F"),
+               ncol = 2, nrow = 2,
+               common.legend = TRUE, legend="bottom",
+               hjust = c(-1.6,-1.7,-1.6,-1.7),
+               align = "hv",
+               font.label = list(size = 14, color = "black", face = "plain"))
+annotate_figure(p, left = textGrob("No of protein identifications", rot = 90, hjust = 0.25, vjust = 1, gp = gpar(cex = 1.0)))
+pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_compare",sample_name1,sample_name2,".png",sep="")
+ggsave(pth,
+       width = 7,
+       height = 7) 
 
 ############################
 #
@@ -227,7 +155,7 @@ ggplot(MBR_comparison, aes(x=Type, y=comparison, color=Evaluation, shape=peptide
   labs(fill = "Evaluation \n method") + 
   facet_wrap(~sample_name, ncol=2) +
   scale_fill_brewer(palette="Dark2", labels = c("pooled\nMaxQuant","pooled\nMaxQuant oldversion","manually\npooled","manually\npooled")) +
-  scale_color_manual(values = c("#1B9E77","#D95F02","#7570B3")) 
+  scale_color_manual(values = c(mypalette_red)) 
 
 pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_comparisonmbr.png")
 ggsave(pth,
@@ -425,5 +353,6 @@ ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=MBR)) +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~Type, ncol = 1) +
   scale_color_manual(values = c(mypalette_red[1],mypalette_blue[1])) + 
-  scale_alpha(0.8)
+  scale_alpha(0.8) +
+  ylim(-50,50)
 
