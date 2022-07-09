@@ -35,6 +35,22 @@ library(pheatmap)
 library(MASS)
 library(ggpubr)
 library(kableExtra)
+library(RColorBrewer)
+
+###########################
+#
+#
+# load color palette
+#
+#
+###########################
+
+mypalette_red <-brewer.pal(9,"PuRd")
+#reverse color to get the more intense for MBR
+mypalette_red <- rev(mypalette_red[c(7:9)])
+mypalette_blue <-brewer.pal(9,"PuBu")
+mypalette_blue <- rev(mypalette_blue[c(7:9)])
+color_manual <- rep(c(mypalette_red,mypalette_blue),3)
 ```
 
 
@@ -86,7 +102,6 @@ col_names <- c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR
 
 ```{r, results="asis"}
 plots_no_onepeptide <- list()
-plots_rsd_onepeptide <- list()
 res_df <- list()
 for (sample_name in sample_names){
   cat("\n")
@@ -130,62 +145,36 @@ for (sample_name in sample_names){
                     levels = c("Razor","Unique","LFQ"))
   df$Evaluation <- factor(df$Evaluation,
                                  levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
-  p_plot_one <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
-      geom_bar(stat='identity', position='dodge') +
+   plot <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
+    geom_bar(stat='identity', position=position_dodge()) +
+    geom_errorbar(aes(ymin = (no-((rsd/2))*100), ymax = (no+((rsd/2))*100)),width=0.2,         position = position_dodge(0.9)) +
     theme_minimal() +
-    scale_fill_brewer(palette="Dark2") +
+    scale_fill_manual(values = alpha(color_manual,0.8)) +
     theme(legend.position="bottom") +
     theme(legend.key.size = unit(0.15, 'cm')) +
     guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
     ylab("No. of protein identifications") +
-    labs(fill = "Evaluation \n method") +
-    coord_cartesian(ylim=c(500,1400))
-    # scale_y_break(c(100,1200)) with library(ggbreak)
-    print(p_plot_one)
-    
-        
-    #plot data
-    rsd_plot_one <- ggplot(df, aes(x=Type, y=rsd, fill=Evaluation)) +
-      geom_bar(stat='identity', position='dodge') +
-    theme_minimal() +
-    scale_fill_brewer(palette="Dark2") +
-    theme(legend.position="bottom") +
-    theme(legend.key.size = unit(0.15, 'cm')) +
-    guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
-    ylab("relative sd [%]") +
-    labs(fill = "Evaluation \n method")+
-    coord_cartesian(ylim=c(0,1.5))
-    print(rsd_plot_one)
+    labs(fill = "Evaluation \n method", title = "one peptide") +
+    coord_cartesian(ylim=c(500,1400)) 
+  print(plot)
     cat("\n")
     
-    plots_no_onepeptide[[sample_name]] <- p_plot_one
-    plots_rsd_onepeptide[[sample_name]] <- rsd_plot_one
+    plots_no_onepeptide[[sample_name]] <- plot
     res_df[[sample_name]] <- df
 }
 ```
 
 ```{r}
 saveRDS(plots_no_onepeptide, file = "plots_no_onepeptide.rds")
-saveRDS(plots_rsd_onepeptide, file = "plots_rsd_onepeptide.rds")
 saveRDS(res_df, file = "results_onepeptide.rds")
 ```
 
-```{r eval=FALSE, include=FALSE}
-df_onepeptide <- readRDS("20220406_TR_QC_summary_rerun_onepeptide.rds")
-t <- df_onepeptide$no/df$no
-tt <- (1-t[1:12])*100
-t_sd <- df_onepeptide$rsd/df$rsd
-tt_sd <- (t[1:12]-1)*100
-df_comp <- as.data.frame(cbind(tt,tt_sd))
-colnames(df_comp) <- c("Protein identification","rsd")
-boxplot(df_comp$`Protein identification`, df_comp$rsd, ylab ="Deviation one peptide vs two peptides [%]", names = colnames(df_comp))
-```
 # LaTeX
 
 ```{r}
 knitr::kable(df, booktabs = T, "latex")
 ```
-
+-
 
 
 # Used time
