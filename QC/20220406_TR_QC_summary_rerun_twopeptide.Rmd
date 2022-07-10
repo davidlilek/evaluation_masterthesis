@@ -235,11 +235,26 @@ Using at least two razor&unique resp unique peptide as treshhold for the data an
 df_onepeptide <- readRDS("20220406_TR_QC_summary_rerun_onepeptide.rds")
 t <- df_onepeptide$no[-c(13:18)]/df$no[-c(13:18)]
 tt <- (1-t[1:12])*100
-t_sd <- df_onepeptide$rsd/df$rsd
-tt_sd <- (t[1:12]-1)*100
+t_sd <- df_onepeptide$rsd[-c(13:18)]/df$rsd[-c(13:18)]
+tt_sd <- (1-t_sd[1:12])*100
 df_comp <- as.data.frame(cbind(tt,tt_sd))
-colnames(df_comp) <- c("Protein identification","rsd")
-boxplot(df_comp$`Protein identification`, df_comp$rsd, ylab ="Deviation one peptide vs two peptides [%]", names = colnames(df_comp))
+colnames(df_comp) <- c("Protein identification","rsd [%]")
+df_comp$Typemethod <- df_onepeptide$Type[-c(13:18)]
+df_comp$Evaluation <- df_onepeptide$Evaluation[-c(13:18)]
+ggplot(melt(df_comp), aes(x=variable, y=value)) + 
+  geom_boxplot() +
+  geom_point(aes(color = Evaluation)) +
+  scale_color_manual(values = rep(c(mypalette_red,mypalette_blue),4)) +
+  scale_alpha(0.8) +
+  xlab("") +
+  ylab("Deviation between one and two peptides [%]") +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) 
+ggsave("../pics/QC_rerun_boxplot.png",
+       width = 7,
+       height = 7)
+
+
 ```
 # LaTeX
 

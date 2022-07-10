@@ -83,7 +83,8 @@ plot_no_two <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, g
   scale_color_manual(values = c(color_manual)) +
   labs(color = "Evaluation \n method") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
-  scale_linetype_manual(values=c("solid","dotted","longdash"))
+  scale_linetype_manual(values=c("solid","dotted","longdash")) +
+  scale_alpha(0.8)
 
 plot_rsd_two <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
@@ -93,7 +94,8 @@ plot_rsd_two <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name,
   labs(color = "Evaluation \n method") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
-  scale_color_manual(values = c(color_manual))
+  scale_color_manual(values = c(color_manual)) +
+  scale_alpha(0.8)
 
 ggarrange(plot_no_two, plot_rsd_two, 
           labels = c("A", "B"),
@@ -144,7 +146,8 @@ plot_no_one <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, g
   scale_color_manual(values = c(color_manual)) +
   labs(color = "Evaluation \n method") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) + 
-  scale_linetype_manual(values=c("solid","dotted","longdash"))
+  scale_linetype_manual(values=c("solid","dotted","longdash")) + 
+  scale_alpha(0.8)
 
 
 plot_rsd_one <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
@@ -155,8 +158,8 @@ plot_rsd_one <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name,
   labs(color = "Evaluation \n method") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
-  scale_color_manual(values = c(color_manual))
-
+  scale_color_manual(values = c(color_manual)) +
+  scale_alpha(0.8)
 
 
 ggarrange(plot_no_one, plot_rsd_one, 
@@ -261,6 +264,7 @@ for (i in 1:4){
     theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
     labs(color = "Type", linetype = "Peptides") +
     scale_color_manual(values = rep(colors_human[i],3) ) +
+    scale_alpha(0.8) +
     facet_wrap(~type)+
     ylim(c(30,47)) +
     theme(strip.background = element_blank(),
@@ -330,14 +334,17 @@ summary(MBR_comparison$rsd)
 summary(noMBR$rsd)
 MBR_comparison$comparison <- ((MBR_comparison$NumberProteins/noMBR$NumberProteins)-1)*100
 
-plot_compMBR_one <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Type, linetype = Evaluation )) +
+plot_compMBR_one <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Evaluation, linetype = Type )) +
   geom_line() +
   geom_point() + 
   ylab("Proportion of more proteins\nfound using MBR [%]") + 
   xlab("Concentration [fmol]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_discrete(labels = c("manually\npooled","pooled\nMaxQuant","pooled\nMaxQuant oldversion")) + 
-  scale_linetype_manual(values=c("solid","dotted","longdash")) 
+  scale_linetype_manual(values=c("solid","dotted","longdash")) +
+  scale_color_manual(values = mypalette_red) + 
+  scale_alpha(0.8)
+  
   
 
 # two peptides
@@ -348,14 +355,16 @@ summary(MBR_comparison$rsd)
 summary(noMBR$rsd)
 MBR_comparison$comparison <- ((MBR_comparison$NumberProteins/noMBR$NumberProteins)-1)*100
 
-plot_compMBR_two <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Type, linetype = Evaluation )) +
+plot_compMBR_two <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Evaluation, linetype = Type)) +
   geom_line() +
   geom_point() + 
   ylab("Proportion of more proteins\nfound using MBR [%]") + 
   xlab("Concentration [fmol]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_discrete(labels = c("manually\npooled","pooled\nMaxQuant","pooled\nMaxQuant oldversion")) + 
-  scale_linetype_manual(values=c("solid","dotted","longdash"))
+  scale_linetype_manual(values=c("solid","dotted","longdash")) +
+  scale_color_manual(values = mypalette_red) +
+  scale_alpha(0.8)
 
 ggarrange(plot_compMBR_one, plot_compMBR_two, 
           labels = c("A", "B"),
