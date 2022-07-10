@@ -17,6 +17,23 @@
 # load libraries
 library(dplyr)
 library(ggplot2)
+library(RColorBrewer)
+
+###########################
+#
+#
+# load color palette
+#
+#
+###########################
+
+mypalette_red <-brewer.pal(9,"PuRd")
+#reverse color to get the more intense for MBR
+mypalette_red <- rev(mypalette_red[c(7:9)])
+mypalette_blue <-brewer.pal(9,"PuBu")
+mypalette_blue <- rev(mypalette_blue[c(7:9)])
+color_manual <- rep(c(mypalette_red,mypalette_blue),3)
+
 
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
 onepeptide <- list()
@@ -87,10 +104,10 @@ lfq_2gether_vector <- unlist(lfq_2gether[,-1], use.names = FALSE)
 d# create variable names and value factors
 
 name <- c(
-  paste(rep("onepetide",39*3),"1",sep=""),
-  paste(rep("onepetide",39*3),"2",sep=""),
-  paste(rep("onepetide",39*3),"3",sep=""),
-  paste(rep("onepetide",39*3),"4",sep="")
+  paste(rep("MBR\n",39*3),"pooled",sep=""),
+  paste(rep("MBR\n",39*3),"pooled\noldversion",sep=""),
+  paste(rep("no MBR\n",39*3),"pooled",sep=""),
+  paste(rep("no MBR\n",39*3),"pooled\noldversion",sep="")
 )
 
 value <- c(rep("intercept",39),
@@ -100,13 +117,15 @@ value <- rep(value,4)
 
 res <- data.frame(lfq_2gether_vector, name, value)
 
-ggplot(res, aes(x=name, y=lfq_2gether_vector, fill=value)) +
-  geom_boxplot() +
+ggplot(res, aes(x=name, y=lfq_2gether_vector, fill=name)) +
+  geom_boxplot(alpha=0.8) +
   facet_wrap(.~value, scales = "free") + 
   labs(y="", x="Evaluation method") +
-  scale_x_discrete(labels= LETTERS[1:4]) +
-  theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=1)) +
-  theme(legend.position="none")
+  theme(axis.text.x=element_blank(), axis.ticks.x = element_blank(), legend.title = element_blank()) +
+  scale_fill_manual(values = c(mypalette_red[c(1:2)],mypalette_blue[c(1:2)])) + 
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())
+
+
 
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_linearmodels_lfqintensity.png"
 ggsave(pth,
