@@ -1,3 +1,5 @@
+library(ggpubr)
+
 # protein identfications and rsd
 plot_one <- readRDS("plot_qc_onepeptide.rds")
 plot_two <- readRDS("plot_qc_twopeptides.rds")

@@ -141,7 +141,8 @@ plot <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
   ylab("No. of protein identifications") +
   labs(fill = "Evaluation \n method", title = "two peptides") +
-  coord_cartesian(ylim=c(1200,2000)) 
+  coord_cartesian(ylim=c(1200,2000)) +
+  geom_text(aes(label=round(no,0)), position = position_dodge(width = 0.9), hjust = 2, vjust=0.4, angle = 90)
 plot
 saveRDS(plot, file = "plot_qc_twopeptides.rds")
 ```
@@ -249,7 +250,8 @@ ggplot(melt(df_comp), aes(x=variable, y=value)) +
   xlab("") +
   ylab("Deviation between one and two peptides [%]") +
   theme(legend.position="bottom") +
-  theme(legend.key.size = unit(0.15, 'cm')) 
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(colour = guide_legend(ncol=2)) 
 ggsave("../pics/QC_rerun_boxplot.png",
        width = 7,
        height = 7)

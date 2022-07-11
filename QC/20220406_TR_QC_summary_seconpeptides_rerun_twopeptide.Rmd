@@ -142,6 +142,8 @@ plot <- ggplot(df, aes(x=Type, y=no, fill=Evaluation)) +
   ylab("No. of protein identifications") +
   labs(fill = "Evaluation \n method", title = "two peptides") +
   coord_cartesian(ylim=c(1200,2100)) 
+          
+      
 plot
 saveRDS(plot, file = "plot_qc_secondpeptides_twopeptides.rds")
 ```

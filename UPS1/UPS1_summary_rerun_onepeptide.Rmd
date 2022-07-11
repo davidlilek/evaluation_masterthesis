@@ -156,7 +156,7 @@ for (sample_name in sample_names){
     ylab("No. of protein identifications") +
     labs(fill = "Evaluation \n method", title = "one peptide") +
     coord_cartesian(ylim=c(500,1400))  + 
-  scale_alpha(0.8)
+  scale_alpha(0.8) 
   print(plot)
     cat("\n")
     
@@ -173,7 +173,7 @@ saveRDS(res_df, file = "results_onepeptide.rds")
 # LaTeX
 
 ```{r}
-knitr::kable(df, booktabs = T, "latex")
+knitr::kable(res_df, booktabs = T, "latex")
 ```
 -
 

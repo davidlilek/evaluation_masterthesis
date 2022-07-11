@@ -76,29 +76,28 @@ res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
 
 plot_no_two <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
-  geom_line() +
-  geom_point() + 
+  geom_line(alpha = 0.8) +
+  geom_point(alpha = 0.8) + 
   ylab("Number of proteins") + 
   xlab("Concentration [fmol]") +
   scale_color_manual(values = c(color_manual)) +
-  labs(color = "Evaluation \n method") +
+  labs(color = "Evaluation \n method", title = "two peptides - number proteins") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
-  scale_alpha(0.8)
+  guides(colour = guide_legend(ncol=6))
 
 plot_rsd_two <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
-  geom_line() +
-  geom_point() + 
+  geom_line(alpha = 0.8) +
+  geom_point(alpha = 0.8) + 
   ylab("rsd [%]") + 
   xlab("Concentration [fmol]") +
-  labs(color = "Evaluation \n method") +
+  labs(color = "Evaluation \n method", title = "two peptides - rsd [%]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
   scale_color_manual(values = c(color_manual)) +
-  scale_alpha(0.8)
+  guides(colour = guide_legend(ncol=6))
 
 ggarrange(plot_no_two, plot_rsd_two, 
-          labels = c("A", "B"),
           ncol = 1, nrow = 2,
           common.legend = TRUE, legend="bottom")
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd_twopeptides.png"
@@ -137,33 +136,33 @@ colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation",
 res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
 res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
+res_2gether$Evaluation <- as.character(res_2gether$Evaluation)
 
 plot_no_one <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
-  geom_line() +
-  geom_point() + 
+  geom_line(alpha = 0.8) +
+  geom_point(alpha = 0.8) + 
   ylab("Number of proteins") + 
   xlab("Concentration [fmol]") +
   scale_color_manual(values = c(color_manual)) +
-  labs(color = "Evaluation \n method") +
+  labs(color = "Evaluation \n method", title = "one peptide - number proteins") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) + 
   scale_linetype_manual(values=c("solid","dotted","longdash")) + 
-  scale_alpha(0.8)
+  guides(colour = guide_legend(ncol=6))
 
 
 plot_rsd_one <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name, color = Evaluation, linetype = Type )) +
-  geom_line() +
-  geom_point() + 
+  geom_line(alpha = 0.8) +
+  geom_point(alpha = 0.8) + 
   ylab("rsd [%]") + 
   xlab("Concentration [fmol]") +
-  labs(color = "Evaluation \n method") +
+  labs(color = "Evaluation \n method", title = "one peptide - rsd [%]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
   scale_color_manual(values = c(color_manual)) +
-  scale_alpha(0.8)
+  guides(colour = guide_legend(ncol=6))
 
 
 ggarrange(plot_no_one, plot_rsd_one, 
-          labels = c("A", "B"),
           ncol = 1, nrow = 2,
           common.legend = TRUE, legend="bottom")
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd_onepeptide.png"
@@ -176,8 +175,7 @@ res_2gether_onepeptide <- res_2gether
 
 # no and rsd one and two peptides plot
 
-ggarrange(plot_no_two, plot_rsd_two, plot_no_one, plot_rsd_one, 
-          labels = c("A", "B", "C", "D"),
+ggarrange(plot_no_one, plot_rsd_one, plot_no_two, plot_rsd_two,
           ncol = 2, nrow = 2,
           common.legend = TRUE, legend="bottom")
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_noproteins_rsd.png"
@@ -238,8 +236,8 @@ peptides <- c(rep("one", 60),
               rep("two",60))
 evaluationmethod <- c(rep("MBR_pooled",15),
                       rep("MBR_pooled_oldversion",15),
-                      rep("noMBR_pooled",15),
-                      rep("noMBR_pooled_oldversion",15))
+                      rep("no_MBR_pooled",15),
+                      rep("no_MBR_pooled_oldversion",15))
 evaluationmethod <- rep(evaluationmethod, 2)
 
 mean_human_proteins <- c(res_number_human_proteins_onepeptide,res_number_human_proteins_twopeptides)
@@ -247,7 +245,7 @@ mean_human_proteins <- c(res_number_human_proteins_onepeptide,res_number_human_p
 
 results_numberhumanproteins <- data.frame(mean_human_proteins, type, conc, peptides, evaluationmethod)
 
-evaluationmethod_forloop <- c("MBR_pooled", "MBR_pooled_oldversion", "noMBR_pooled", "noMBR_pooled_oldversion")
+evaluationmethod_forloop <- c("MBR_pooled", "MBR_pooled_oldversion", "no_MBR_pooled", "no_MBR_pooled_oldversion")
 plots_numberhumanproteins <- list()
 
 colors_human <- c(mypalette_red[c(1:2)],mypalette_blue[c(1:2)])
@@ -267,13 +265,13 @@ for (i in 1:4){
     scale_alpha(0.8) +
     facet_wrap(~type)+
     ylim(c(30,47)) +
+    ggtitle(gsub("_"," ",evaluationmethod_forloop[i]))
     theme(strip.background = element_blank(),
           strip.text.x = element_blank())
   plots_numberhumanproteins[[i]] <- plot  
 }
 
 ggarrange(plotlist = plots_numberhumanproteins,
-          labels = c("A", "B", "C", "D"),
           ncol = 2, nrow = 2,
           common.legend = TRUE, legend="bottom")
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_nohumanproteins.png"
@@ -335,15 +333,15 @@ summary(noMBR$rsd)
 MBR_comparison$comparison <- ((MBR_comparison$NumberProteins/noMBR$NumberProteins)-1)*100
 
 plot_compMBR_one <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Evaluation, linetype = Type )) +
-  geom_line() +
-  geom_point() + 
+  geom_line(alpha = 0.8) +
+  geom_point(alpha = 0.8) + 
   ylab("Proportion of more proteins\nfound using MBR [%]") + 
   xlab("Concentration [fmol]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_discrete(labels = c("manually\npooled","pooled\nMaxQuant","pooled\nMaxQuant oldversion")) + 
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
   scale_color_manual(values = mypalette_red) + 
-  scale_alpha(0.8)
+  ggtitle("one peptide")
   
   
 
@@ -356,18 +354,17 @@ summary(noMBR$rsd)
 MBR_comparison$comparison <- ((MBR_comparison$NumberProteins/noMBR$NumberProteins)-1)*100
 
 plot_compMBR_two <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Evaluation, linetype = Type)) +
-  geom_line() +
-  geom_point() + 
+  geom_line(alpha = 0.8) +
+  geom_point(alpha = 0.8) + 
   ylab("Proportion of more proteins\nfound using MBR [%]") + 
   xlab("Concentration [fmol]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_discrete(labels = c("manually\npooled","pooled\nMaxQuant","pooled\nMaxQuant oldversion")) + 
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
   scale_color_manual(values = mypalette_red) +
-  scale_alpha(0.8)
+  ggtitle("two peptides")
 
 ggarrange(plot_compMBR_one, plot_compMBR_two, 
-          labels = c("A", "B"),
           ncol = 1, nrow = 2,
           common.legend = TRUE, legend="bottom")
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_comparisonMBRnoMBR.png"
