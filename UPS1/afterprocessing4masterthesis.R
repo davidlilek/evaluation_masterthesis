@@ -9,6 +9,7 @@ library(stringr)
 library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
+library(reshape)
 
 ###########################
 #
@@ -110,7 +111,7 @@ res_2gether_twopeptides <- res_2gether
 ############################
 ####### comparing via concentration one peptide
 #############################
-res_twopeptides <- readRDS("results_onepeptide.rds")
+res_peptides <- readRDS("results_onepeptide.rds")
 sample_names <- c("10fmol","25fmol","2fmol","4fmol","50fmol")
 number_proteins <- c()
 name <- c()
@@ -120,7 +121,7 @@ type <- c()
 evaluation <- c()
 
 for (sample_name in sample_names){
-  tmp <- res_twopeptides[[sample_name]]
+  tmp <- res_peptides[[sample_name]]
   number_proteins <- append(number_proteins,tmp[,1])
   name <- append(name,
                  paste(tmp[,3],"_",tmp[,4], sep = ""))
@@ -183,10 +184,50 @@ ggsave(pth,
        width = 7,
        height = 7)  
 
+#############################################
+#
+# compare one and two peptides
+#
+#############################################
 
-######################## compare no human proteins 
+# comparison one and two peptides
+comp_one_two <- as.data.frame(((res_2gether_onepeptide$NumberProteins/res_2gether_twopeptides$NumberProteins)-1)*100)
+comp_one_two$rsd <- ((res_2gether_onepeptide$rsd/res_2gether_twopeptides$rsd)-1)*100
+colnames(comp_one_two) <- c("No","rsd [%]")
+comp_one_two$Evaluation <- res_2gether_onepeptide$Evaluation
+comp_one_two$Concentration <- res_2gether_onepeptide$Concentration
+comp_one_two$conc_4plot <- paste(comp_one_two$Concentration,"fmol",sep="")
+comp_one_two$conc_4plot <- factor(comp_one_two$conc_4plot,
+                                  levels=c("2fmol","4fmol","10fmol","25fmol","50fmol"))
+# melt results for ggplot
+comp_one_two_4plot <- melt(comp_one_two, id = c("Evaluation", "Concentration","conc_4plot"))
+# remove all 0 values
+comp_one_two_4plot[comp_one_two_4plot == 0] <- NA
+
+
+ggplot(comp_one_two_4plot, aes(x=variable, y=value)) + 
+  geom_boxplot() +
+  geom_point(aes(color = Evaluation)) +
+  scale_color_manual(values = rep(c(mypalette_red,mypalette_blue),4)) +
+  scale_alpha(0.8) +
+  xlab("") +
+  ylab("Deviation between one and two peptides [%]") +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  guides(colour = guide_legend(ncol=2)) +
+  facet_wrap(~conc_4plot, ncol = 5)
+
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_compare_onetwopeptides.png"
+ggsave(pth,
+       width = 7,
+       height = 7)  
+
+###############################################
+#
+# compare no human proteins 
+#
+###############################################
 # should be 47
-
 
 path = "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/UPS1/tmpfiles/UPS1_oneuniquepeptide_human/"
 
@@ -281,48 +322,9 @@ ggsave(pth,
 
 #####################################################
 #
-########################## comparing MBR no MBR
+# comparing MBR no MBR
 #
 #####################################################
-
-########## comparing one and two peptides 
-res_2gether_onepeptide$diffonetwo <- res_2gether_onepeptide$NumberProteins/res_2gether_twopeptides$NumberProteins
-
-razor <- subset(res_2gether_onepeptide, diffonetwo > 1 & Type == "Razor")
-unique <-subset(res_2gether_onepeptide, diffonetwo > 1 & Type == "Unique")
-
-mean(razor$diffonetwo)
-mean(unique$diffonetwo)
-
-
-plot(razor$Concentration,razor$diffonetwo)
-plot(unique$Concentration,unique$diffonetwo)
-
-
-razor <- subset(res_2gether_onepeptide, diffonetwo > 1 & Type == "Razor")
-unique <-subset(res_2gether_onepeptide, diffonetwo > 1 & Type == "Unique")
-
-
-razor_MBR <- razor %>% filter(str_detect(Evaluation, "^MBR"))
-razor_noMBR <- razor %>% filter(grepl("noMBR", Evaluation))
-
-unique_MBR <- unique %>% filter(str_detect(Evaluation, "^MBR"))
-unique_noMBR <- unique %>% filter(grepl("noMBR", Evaluation))
-
-plot(razor_MBR$Concentration, razor_MBR$diffonetwo)
-plot(unique_MBR$Concentration, unique_MBR$diffonetwo)
-
-plot(razor_noMBR$Concentration, razor_noMBR$diffonetwo)
-plot(unique_noMBR$Concentration, unique_noMBR$diffonetwo)
-
-mean(razor_MBR$diffonetwo)
-mean(razor_noMBR$diffonetwo)
-mean(unique_MBR$diffonetwo)
-mean(unique_noMBR$diffonetwo)
-
-
-############# compare MBR and no MBR
-
 
 # one peptide
 
@@ -380,7 +382,7 @@ ggsave(pth,
 #
 #####################################################
 
-# viszulaize difference
+# viszulaize difference number of proteins
 
 one_raw <- as.data.frame(readRDS("results_secondpeptides_onepeptide.rds"))
 two_raw <- as.data.frame(readRDS("results_secondpeptides_twopeptides.rds"))
@@ -420,19 +422,79 @@ compare_secondpeptides$Type <- factor(compare_secondpeptides$Type,
 
 dodge <- position_dodge(.3)
 
-ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=MBR)) +
-  geom_point(position = dodge, size = 3, aes(shape = shapes)) +
-  scale_shape_manual(values=c(1, 16, 2, 17)) +
+ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=shapes)) +
+  geom_point(position = dodge, size = 3, aes(shape = shapes), alpha = 0.8) +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
-  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
-  ylab("Deviation using second pepitdes [%]") +
+  ylab("Deviation using option second pepitdes [%]") +
   xlab("Concentration[fmol]") +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~Type, ncol = 1) +
-  scale_color_manual(values = c(mypalette_red[1],mypalette_blue[1])) + 
-  scale_alpha(0.8)
+  scale_color_manual(name = "Evaluation method", values = c(mypalette_red[1],mypalette_red[1],mypalette_blue[1],mypalette_blue[1]), labels = c("MBR - one peptide ", "MBR - two peptides", "no MBR - one peptide ", "no MBR - two peptides")) + 
+  scale_shape_manual(name = "Evaluation method", values=c(1, 16, 2, 17), labels = c("MBR - one peptide ", "MBR - two peptides", "no MBR - one peptide ", "no MBR - two peptides") )
 
  
-  
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_comparison_secondpeptides.png"
+ggsave(pth,
+       width = 7,
+       height = 7)   
+
+# visualize differences using rsd
+
+# viszulaize difference number of proteins
+
+one_raw <- as.data.frame(readRDS("results_secondpeptides_onepeptide.rds"))
+two_raw <- as.data.frame(readRDS("results_secondpeptides_twopeptides.rds"))
+
+one <- one_raw
+two <- two_raw
+
+one <- one[,grepl("rsd",colnames(one))]
+two <- two[,grepl("rsd",colnames(two))]
+
+one_diff <- t(data.frame(((one[2,]/one[1,])-1)*100, # 5x mbr 5x razor 5xone
+                         ((one[4,]/one[3,])-1)*100,            # 5x no MBR 5x razor 5x one
+                         ((one[6,]/one[5,])-1)*100,            # 5x  MBR 5x unique 5x one
+                         ((one[8,]/one[7,])-1)*100,            # 5x  no MBR 5x unique 5x one
+                         ((one[10,]/one[9,])-1)*100,            # 5x MBR 5x lfq 5x one
+                         ((one[12,]/one[11,])-1)*100))            # 5x no MBR 5x lfq 5x one
+
+two_diff <-  t(data.frame(
+  (((two[2,]/two[1,])-1)*100),
+  (((two[4,]/two[3,])-1)*100),
+  (((two[6,]/two[5,])-1)*100),
+  (((two[8,]/two[7,])-1)*100),
+  (((two[10,]/two[9,])-1)*100),
+  (((two[12,]/two[11,])-1)*100)))
+
+compare_secondpeptides <- as.data.frame(rbind(one_diff,two_diff))
+colnames(compare_secondpeptides) <-c("results")
+compare_secondpeptides$number <- rep(c("one","two"),each = 30)
+compare_secondpeptides$MBR <- rep(rep(c("MBR","no_MBR"),each = 5),6)
+compare_secondpeptides$Type <- rep(rep(c("Razor","Unique","LFQ"), each = 10),2)
+compare_secondpeptides$Concentration <- as.factor(rep(c(10,25,2,4,50), 12))
+compare_secondpeptides$shapes <- paste(compare_secondpeptides$MBR,compare_secondpeptides$number
+                                       ,sep="_")
+
+compare_secondpeptides$Type <- factor(compare_secondpeptides$Type,
+                                      levels = c("Razor", "Unique", "LFQ"))
+
+dodge <- position_dodge(.3)
+
+ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=shapes)) +
+  geom_point(position = dodge, size = 3, aes(shape = shapes), alpha = 0.8) +
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.15, 'cm')) +
+  ylab("Deviation using option second pepitdes [%]") +
+  xlab("Concentration[fmol]") +
+  labs(fill = "Evaluation \n method") +
+  facet_wrap(~Type, ncol = 1) +
+  scale_color_manual(name = "Evaluation method", values = c(mypalette_red[1],mypalette_red[1],mypalette_blue[1],mypalette_blue[1]), labels = c("MBR - one peptide ", "MBR - two peptides", "no MBR - one peptide ", "no MBR - two peptides")) + 
+  scale_shape_manual(name = "Evaluation method", values=c(1, 16, 2, 17), labels = c("MBR - one peptide ", "MBR - two peptides", "no MBR - one peptide ", "no MBR - two peptides") )
+
+
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_comparison_secondpeptides_rsd.png"
+ggsave(pth,
+       width = 7,
+       height = 7)   
 

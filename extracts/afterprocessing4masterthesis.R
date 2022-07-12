@@ -75,7 +75,7 @@ sample_name1 <- "_C"
 sample_name2 <- "_D"
 p <- ggarrange(plots_no_onepeptide[[sample_name1]]+rremove("ylab"),plots_no_twopeptides[[sample_name1]]+rremove("ylab"), 
                plots_no_onepeptide[[sample_name2]]+rremove("ylab"),plots_no_twopeptides[[sample_name2]]+rremove("ylab"), 
-               labels = c("- Extract A", "- Extract A", "- Extract B", "- Extract B"),
+               labels = c("- Extract C", "- Extract C", "- Extract D", "- Extract D"),
                ncol = 2, nrow = 2,
                common.legend = TRUE, legend="bottom",
                hjust = c(-1.6,-1.7,-1.6,-1.7),
@@ -188,7 +188,7 @@ diff_4plot$Evaluation <- factor(diff_4plot$Evaluation,
                                                  levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
 
 plot_peptides <- ggplot(diff_4plot, aes(x=Type, y=value, color=Evaluation)) +
-  geom_point(position = dodge, size = 2.5) +
+  geom_point(position = dodge, size = 2.5, alpha = 0.8) +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
@@ -196,7 +196,7 @@ plot_peptides <- ggplot(diff_4plot, aes(x=Type, y=value, color=Evaluation)) +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~extract) + 
   scale_color_manual(values = color_manual) + 
-  scale_alpha(0.8)
+  guides(colour = guide_legend(ncol=6))
   
 plot_peptides
 
@@ -226,15 +226,15 @@ diff_4plot$Evaluation <- factor(diff_4plot$Evaluation,
                                 levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
 
 plot_peptides <- ggplot(diff_4plot, aes(x=Type, y=value, color=Evaluation)) +
-  geom_point(position = dodge, size = 2.5) +
+  geom_point(position = dodge, size = 2.5, alpha = 0.8) +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
   ylab("Deviation one vs. two peptides [%]") +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~extract) + 
-  scale_color_manual(values = color_manual) + 
-  scale_alpha(0.8)
+  scale_color_manual(values = color_manual) +
+  guides(colour = guide_legend(ncol=6))
 
 plot_peptides
 
@@ -289,18 +289,22 @@ compare_secondpeptides$Type <- factor(compare_secondpeptides$Type,
 
 dodge <- position_dodge(.3)
 
-ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=MBR)) +
-  geom_point(position = dodge, size = 3, aes(shape = shapes)) +
-  scale_shape_manual(values=c(1, 16, 2, 17)) +
+ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=shapes)) +
+  geom_point(position = dodge, size = 3, aes(shape = shapes), alpha = 0.8) +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
-  guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
+  guides(shape=guide_legend(nrow=2, byrow=TRUE)) +
   ylab("Deviation using second pepitdes [%]") +
-  xlab("Concentration[fmol]") +
+  xlab("Extract") +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~Type, ncol = 1) +
-  scale_color_manual(values = c(mypalette_red[1],mypalette_blue[1])) + 
-  scale_alpha(0.8)
+  scale_color_manual(name = "Evaluation method", values = c(mypalette_red[1],mypalette_red[1],mypalette_blue[1],mypalette_blue[1]), labels = c("MBR\none peptide ", "MBR\ntwo peptides", "no MBR\none peptide ", "no MBR\ntwo peptides")) + 
+  scale_shape_manual(name = "Evaluation method", values=c(1, 16, 2, 17), labels = c("MBR\none peptide ", "MBR\ntwo peptides", "no MBR\none peptide ", "no MBR\ntwo peptides") )
+
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_comparison_secondpeptides.png"
+ggsave(pth,
+       width = 7,
+       height = 7)   
 
 # rsd
 
@@ -342,17 +346,20 @@ compare_secondpeptides$Type <- factor(compare_secondpeptides$Type,
 
 dodge <- position_dodge(.3)
 
-ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=MBR)) +
-  geom_point(position = dodge, size = 3, aes(shape = shapes)) +
-  scale_shape_manual(values=c(1, 16, 2, 17)) +
+ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=shapes)) +
+  geom_point(position = dodge, size = 3, aes(shape = shapes), alpha = 0.8) +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
   ylab("Deviation using second pepitdes [%]") +
-  xlab("Concentration[fmol]") +
+  xlab("Extract") +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~Type, ncol = 1) +
-  scale_color_manual(values = c(mypalette_red[1],mypalette_blue[1])) + 
-  scale_alpha(0.8) +
-  ylim(-50,50)
+  scale_color_manual(name = "Evaluation method", values = c(mypalette_red[1],mypalette_red[1],mypalette_blue[1],mypalette_blue[1]), labels = c("MBR\none peptide ", "MBR\ntwo peptides", "no MBR\none peptide ", "no MBR\ntwo peptides")) + 
+  scale_shape_manual(name = "Evaluation method", values=c(1, 16, 2, 17), labels = c("MBR\none peptide ", "MBR\ntwo peptides", "no MBR\none peptide ", "no MBR\ntwo peptides") )
 
+
+pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_comparison_secondpeptides_rsd.png"
+ggsave(pth,
+       width = 7,
+       height = 7)   
