@@ -76,12 +76,16 @@ res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
 res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
 
+res_2gether$Evaluation <- factor(res_2gether$Evaluation,
+                        levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
+
+
 plot_no_two <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
   geom_line(alpha = 0.8) +
   geom_point(alpha = 0.8) + 
   ylab("Number of proteins") + 
   xlab("Concentration [fmol]") +
-  scale_color_manual(values = c(color_manual)) +
+  scale_color_manual(values = c(color_manual), labels = c("MBR\npooled","MBR\npooled oldversion","MBR", "no MBR\npooled", "no MBR\npooled oldversion","no MBR")) +
   labs(color = "Evaluation \n method", title = "two peptides - number proteins") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
@@ -95,7 +99,7 @@ plot_rsd_two <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name,
   labs(color = "Evaluation \n method", title = "two peptides - rsd [%]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
-  scale_color_manual(values = c(color_manual)) +
+  scale_color_manual(values = c(color_manual), labels = c("MBR\npooled","MBR\npooled oldversion","MBR", "no MBR\npooled", "no MBR\npooled oldversion","no MBR")) +
   guides(colour = guide_legend(ncol=6))
 
 ggarrange(plot_no_two, plot_rsd_two, 
@@ -139,12 +143,16 @@ res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
 res_2gether$Evaluation <- as.character(res_2gether$Evaluation)
 
+res_2gether$Evaluation <- factor(res_2gether$Evaluation,
+                                 levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
+
+
 plot_no_one <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
   geom_line(alpha = 0.8) +
   geom_point(alpha = 0.8) + 
   ylab("Number of proteins") + 
   xlab("Concentration [fmol]") +
-  scale_color_manual(values = c(color_manual)) +
+  scale_color_manual(values = c(color_manual), labels = c("MBR\npooled","MBR\npooled oldversion","MBR", "no MBR\npooled", "no MBR\npooled oldversion","no MBR")) +
   labs(color = "Evaluation \n method", title = "one peptide - number proteins") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) + 
   scale_linetype_manual(values=c("solid","dotted","longdash")) + 
@@ -159,7 +167,7 @@ plot_rsd_one <- ggplot(data=res_2gether, aes(x=Concentration, y=rsd, group=Name,
   labs(color = "Evaluation \n method", title = "one peptide - rsd [%]") +
   theme(legend.position="bottom", legend.box="vertical", legend.margin=margin()) +
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
-  scale_color_manual(values = c(color_manual)) +
+  scale_color_manual(values = c(color_manual), labels = c("MBR\npooled","MBR\npooled oldversion","MBR", "no MBR\npooled", "no MBR\npooled oldversion","no MBR")) +
   guides(colour = guide_legend(ncol=6))
 
 
@@ -195,6 +203,9 @@ comp_one_two <- as.data.frame(((res_2gether_onepeptide$NumberProteins/res_2gethe
 comp_one_two$rsd <- ((res_2gether_onepeptide$rsd/res_2gether_twopeptides$rsd)-1)*100
 colnames(comp_one_two) <- c("No","rsd [%]")
 comp_one_two$Evaluation <- res_2gether_onepeptide$Evaluation
+comp_one_two$Evaluation <- factor(comp_one_two$Evaluation,
+                                 levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
+
 comp_one_two$Concentration <- res_2gether_onepeptide$Concentration
 comp_one_two$conc_4plot <- paste(comp_one_two$Concentration,"fmol",sep="")
 comp_one_two$conc_4plot <- factor(comp_one_two$conc_4plot,
@@ -204,17 +215,16 @@ comp_one_two_4plot <- melt(comp_one_two, id = c("Evaluation", "Concentration","c
 # remove all 0 values
 comp_one_two_4plot[comp_one_two_4plot == 0] <- NA
 
-
 ggplot(comp_one_two_4plot, aes(x=variable, y=value)) + 
   geom_boxplot() +
   geom_point(aes(color = Evaluation)) +
-  scale_color_manual(values = rep(c(mypalette_red,mypalette_blue),4)) +
+  scale_color_manual(values = rep(c(mypalette_red,mypalette_blue),4), labels = c("MBR\npooled","MBR\npooled oldversion","MBR", "no MBR\npooled", "no MBR\npooled oldversion","no MBR")) +
   scale_alpha(0.8) +
   xlab("") +
   ylab("Deviation between one and two peptides [%]") +
   theme(legend.position="bottom") +
   theme(legend.key.size = unit(0.15, 'cm')) +
-  guides(colour = guide_legend(ncol=2)) +
+  guides(colour = guide_legend(ncol=6)) +
   facet_wrap(~conc_4plot, ncol = 5)
 
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_compare_onetwopeptides.png"
@@ -222,6 +232,18 @@ ggsave(pth,
        width = 7,
        height = 7)  
 
+# correlation between no and deviation
+require(plyr)
+xx <- comp_one_two
+func <- function(xx)
+{
+  return(data.frame(COR = cor(xx$Concentration, xx$No, use="complete.obs")))
+}
+
+corr <- ddply(xx, .(Evaluation), func)
+corr
+mean(corr$COR[4:6])
+mean(corr$COR[1:3])
 ###############################################
 #
 # compare no human proteins 
@@ -333,6 +355,8 @@ noMBR <- res_2gether_onepeptide %>% filter(str_detect(Evaluation, "^noMBR"))
 summary(MBR_comparison$rsd)
 summary(noMBR$rsd)
 MBR_comparison$comparison <- ((MBR_comparison$NumberProteins/noMBR$NumberProteins)-1)*100
+MBR_comparison$Evaluation <- factor(MBR_comparison$Evaluation,
+                                 levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
 
 plot_compMBR_one <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Evaluation, linetype = Type )) +
   geom_line(alpha = 0.8) +
@@ -344,8 +368,6 @@ plot_compMBR_one <- ggplot(data=MBR_comparison, aes(x=Concentration, y=compariso
   scale_linetype_manual(values=c("solid","dotted","longdash")) +
   scale_color_manual(values = mypalette_red) + 
   ggtitle("one peptide")
-  
-  
 
 # two peptides
 
@@ -354,6 +376,8 @@ noMBR <- res_2gether_twopeptides %>% filter(str_detect(Evaluation, "^noMBR"))
 summary(MBR_comparison$rsd)
 summary(noMBR$rsd)
 MBR_comparison$comparison <- ((MBR_comparison$NumberProteins/noMBR$NumberProteins)-1)*100
+MBR_comparison$Evaluation <- factor(MBR_comparison$Evaluation,
+                                    levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
 
 plot_compMBR_two <- ggplot(data=MBR_comparison, aes(x=Concentration, y=comparison, group=Name, color = Evaluation, linetype = Type)) +
   geom_line(alpha = 0.8) +
