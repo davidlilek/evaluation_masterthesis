@@ -430,9 +430,8 @@ ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=shapes)) +
   xlab("Concentration[fmol]") +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~Type, ncol = 1) +
-  scale_color_manual(name = "Evaluation method", values = c(mypalette_red[1],mypalette_red[1],mypalette_blue[1],mypalette_blue[1]), labels = c("MBR - one peptide ", "MBR - two peptides", "no MBR - one peptide ", "no MBR - two peptides")) + 
-  scale_shape_manual(name = "Evaluation method", values=c(1, 16, 2, 17), labels = c("MBR - one peptide ", "MBR - two peptides", "no MBR - one peptide ", "no MBR - two peptides") )
-
+  scale_color_manual(name = "Evaluation method", values = c(mypalette_red[1],mypalette_red[1],mypalette_blue[1],mypalette_blue[1]), labels = c("MBR\none peptide ", "MBR\ntwo peptides", "no MBR\none peptide ", "no MBR\ntwo peptides")) + 
+  scale_shape_manual(name = "Evaluation method", values=c(1, 16, 2, 17), labels = c("MBR\none peptide ", "MBR\ntwo peptides", "no MBR\none peptide ", "no MBR\ntwo peptides") )
  
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_comparison_secondpeptides.png"
 ggsave(pth,
@@ -489,9 +488,8 @@ ggplot(compare_secondpeptides, aes(x=Concentration, y=results, color=shapes)) +
   xlab("Concentration[fmol]") +
   labs(fill = "Evaluation \n method") +
   facet_wrap(~Type, ncol = 1) +
-  scale_color_manual(name = "Evaluation method", values = c(mypalette_red[1],mypalette_red[1],mypalette_blue[1],mypalette_blue[1]), labels = c("MBR - one peptide ", "MBR - two peptides", "no MBR - one peptide ", "no MBR - two peptides")) + 
-  scale_shape_manual(name = "Evaluation method", values=c(1, 16, 2, 17), labels = c("MBR - one peptide ", "MBR - two peptides", "no MBR - one peptide ", "no MBR - two peptides") )
-
+  scale_color_manual(name = "Evaluation method", values = c(mypalette_red[1],mypalette_red[1],mypalette_blue[1],mypalette_blue[1]), labels = c("MBR\none peptide ", "MBR\ntwo peptides", "no MBR\none peptide ", "no MBR\ntwo peptides")) + 
+  scale_shape_manual(name = "Evaluation method", values=c(1, 16, 2, 17), labels = c("MBR\none peptide ", "MBR\ntwo peptides", "no MBR\none peptide ", "no MBR\ntwo peptides") )
 
 pth <- "N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/ups1_comparison_secondpeptides_rsd.png"
 ggsave(pth,

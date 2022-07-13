@@ -157,8 +157,7 @@ for (sample_name in sample_names){
       guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
       ylab("No. of protein identifications") +
       labs(fill = "Evaluation \n method", title = "one peptide") +
-      coord_cartesian(ylim=c(200,1200)) +
-      geom_text(aes(label=round(no,0)), position = position_dodge(width = 0.9), hjust = 2, vjust=0.4, angle = 90)
+      coord_cartesian(ylim=c(200,1200))
     print(plot)
     cat("\n")
         

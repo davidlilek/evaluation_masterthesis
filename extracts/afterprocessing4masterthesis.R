@@ -13,6 +13,7 @@ library(reshape2)
 library(RColorBrewer)
 library(grid)
 library(gridExtra)
+library(corrplot)
 
 ###########################
 #
@@ -141,6 +142,9 @@ MBR_comparison_twopeptides <- MBR_comparison
 MBR_comparison <- rbind(MBR_comparison_onepeptide,MBR_comparison_twopeptides)
 MBR_comparison$peptides <- rep(c("one","two"),each=54)
 
+# correlation plot
+pairs(MBR_comparison[,c(1,2,6)])
+corrplot(cor(MBR_comparison[,c(1,2,6)]),method = 'color', order = 'alphabet')
 # how much jitter on the x-axis
 dodge <- position_dodge(.3)
 
