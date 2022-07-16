@@ -70,8 +70,8 @@ for (sample_name in sample_names){
 }
 
 
-res_2gether <- as.data.frame(cbind(number_proteins,conc,name,evaluation, type, rsd))
-colnames(res_2gether) <- c("NumberProteins","Concentration","Name","Evaluation","Type","rsd")
+res_2gether <- as.data.frame(cbind(number_proteins, rsd, conc,name,evaluation, type))
+colnames(res_2gether) <- c("NumberProteins","rsd","Concentration","Name","Evaluation","Type")
 res_2gether$NumberProteins <- as.numeric(res_2gether$NumberProteins)
 res_2gether$rsd <- as.numeric(res_2gether$rsd)
 res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
@@ -79,6 +79,7 @@ res_2gether$Concentration <- rep(c(10, 25, 2, 4, 50), each = 18)
 res_2gether$Evaluation <- factor(res_2gether$Evaluation,
                         levels = c("MBR_pooled","MBR_pooled\noldversion","MBR","noMBR_pooled","noMBR_pooled\noldversion","noMBR"))
 
+knitr::kable(res_2gether, booktabs = T, "latex")
 
 plot_no_two <- ggplot(data=res_2gether, aes(x=Concentration, y=NumberProteins, group=Name, color = Evaluation, linetype = Type )) +
   geom_line(alpha = 0.8) +

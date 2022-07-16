@@ -52,6 +52,34 @@ for (sample_name in sample_names){
          height = 7)  
 }
 
+### combine all
+
+sample_name1 <- "_A"
+sample_name2 <- "_B"
+sample_name3 <- "_C"
+sample_name4 <- "_D"
+sample_name5 <- "_E"
+sample_name6 <- "_F"
+
+p <- ggarrange(plots_no_onepeptide[[sample_name1]]+rremove("ylab")+rremove("xlab"),plots_no_onepeptide[[sample_name2]]+rremove("ylab")+rremove("xlab"),plots_no_onepeptide[[sample_name3]]+rremove("ylab")+rremove("xlab"),
+               plots_no_onepeptide[[sample_name4]]+rremove("ylab")+rremove("xlab"),plots_no_onepeptide[[sample_name5]]+rremove("ylab")+rremove("xlab"),plots_no_onepeptide[[sample_name6]]+rremove("ylab")+rremove("xlab"),
+               plots_no_twopeptides[[sample_name1]]+rremove("ylab")+rremove("xlab"),plots_no_twopeptides[[sample_name2]]+rremove("ylab")+rremove("xlab"),plots_no_twopeptides[[sample_name3]]+rremove("ylab")+rremove("xlab"),
+               plots_no_twopeptides[[sample_name4]]+rremove("ylab")+rremove("xlab"),plots_no_twopeptides[[sample_name5]]+rremove("ylab")+rremove("xlab"),plots_no_twopeptides[[sample_name6]]+rremove("ylab")+rremove("xlab"),
+               labels = c("- Extract A", "- Extract B", "- Extract C",
+                          "- Extract D", "- Extract E", "- Extract F",
+                          "- Extract A", "- Extract B", "- Extract C",
+                          "- Extract D", "- Extract E", "- Extract F"),
+               ncol = 3, nrow = 4,
+               common.legend = TRUE, legend="bottom",
+               hjust = c(-1.6,-1.7,-1.6,-1.7),
+               align = "hv",
+               font.label = list(size = 14, color = "black", face = "plain"))
+annotate_figure(p, left = textGrob("No of protein identifications", rot = 90, hjust = 0.25, vjust = 1, gp = gpar(cex = 1.0)))
+pth <- paste("N:/1_A_Bachelor_Master_Intern/00_M_2022/David/Data/evaluation_masterthesis/pics/extracts_rerun_compare_all.png",sep="")
+ggsave(pth,
+       width = 8.5,
+       height = 10)
+
 ### combine A-B
 
 sample_name1 <- "_A"
