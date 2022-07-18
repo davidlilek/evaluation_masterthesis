@@ -24,6 +24,7 @@ library(ggfortify)
 library(gtools)
 library(ggpubr)
 library(gridExtra)
+library(RColorBrewer)
 
 # load functions
 filtering <- function(data_raw){
@@ -32,6 +33,10 @@ filtering <- function(data_raw){
     Reverse == "",
     Only.identified.by.site == "")
 }
+
+# get colors
+mypalette_grey <-brewer.pal(9,"Greys")
+
 
 ####################################
 #
@@ -306,9 +311,25 @@ res_plot_group <- data.frame(cbind(group, comparison, res_plot))
 colnames(res_plot_group) <- c("Group", "Comparison", "counts")
 res_plot_group$counts <- as.double(res_plot_group$counts)
 # create stacked barplot
+
+#reverse color to get the more intense for MBR
+mypalette_red <- mypalette_grey
+mypalette_red <- mypalette_red[c(9,7,5,3,2)]
+
+res_plot_group$Group <- factor(res_plot_group$Group,
+                  levels = c("equal",
+                            "significant higher",
+                            "significant lower",
+                            "not significant higher",
+                            "not significant lower"))
 b_plot <- ggplot(res_plot_group, aes(fill = Group, y = counts, x=Comparison, label = counts)) +
-  geom_bar( position = "stack",stat="identity") + 
-  geom_text(size = 2, position = position_stack(vjust = 0.5))
+  geom_bar( position = "stack",stat="identity", alpha = 0.8, color = "black") + 
+  scale_fill_manual(values = mypalette_red) +
+  scale_linetype_manual(values = c("dashed")) +
+  theme_bw() + 
+  theme(legend.position="bottom") +
+  theme(legend.key.size = unit(0.40, 'cm'))
+  
 b_plot
 ggsave("../pics/barplot_lfqintensities.png",
        width = 7,
