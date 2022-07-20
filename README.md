@@ -15,6 +15,18 @@ For performance test in MaxQuant different parameters were varied, as shown belo
 
 <img width="517" alt="performancetest_maxquant_pic" src="https://user-images.githubusercontent.com/60740660/179982995-e85ee211-f597-4a03-9692-1d3d102398fa.png">
 
+The different evaluation methods were analyzed using different protein types as shown below. 
+
+* Razor: non-unique peptides; these peptides are assigned to the protein group with the largest number of total identified peptides |
+* Unique: peptides which are unique for this protein group | 
+* LFQ: label free quantification (quantified proteins). 
+
+The option one peptide or two peptides refers to the minimum number of peptides required for protein identification.
+
+<img width="374" alt="proteintypes_github" src="https://user-images.githubusercontent.com/60740660/180036892-1f627191-42c4-4117-9e3d-fd464d4f8538.png">
+
+
+
 
 ## QC
 
