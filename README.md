@@ -25,12 +25,41 @@ The option one peptide or two peptides refers to the minimum number of peptides 
 
 <img width="374" alt="proteintypes_github" src="https://user-images.githubusercontent.com/60740660/180036892-1f627191-42c4-4117-9e3d-fd464d4f8538.png">
 
-
-
-
 ## QC
 
+Contains one Rmd for each evaluation method as described above resulting in 8 Rmd files. `20220406_TR_QC` refers to the LC-MS/MS sequence name.
+The results are summarized in 4 Rmd files.
+
+* `20220406_TR_QC_summary_rerun_onepeptide.Rmd`
+* `20220406_TR_QC_summary_rerun_seconpeptides_onepeptide.Rmd`
+* `20220406_TR_QC_summary_rerun_twopeptide.Rmd`
+* `20220406_TR_QC_summary_seconpeptides_rerun_twopeptide.Rmd`
+
+In this files the results are sumarized and plots created and arranged for master thesis in file `afterprocessing4masterthesis.R`.
+
+LFQ intensities were compared and analyzed using `compare_lfqintensities.R`.
+
 ## UPS1
+
+Contains one Rmd for each evaluation method as described above resulting in 8 Rmd files. `20220406_TR_QC` refers to the LC-MS/MS sequence name.
+The results are summarized in 4 Rmd files.
+
+* `UPS1_summary_rerun_secondpeptides_onepeptide.Rmd`
+* `UPS1_summary_rerun_secondpeptides_onepeptide.Rmd`
+* `UPS1_summary_rerun_twopeptide.Rmd`
+* `UPS1_summary_rerun_secondpeptides_twopeptide.Rmd`
+
+In this files the results are sumarized and plots created.
+
+LFQ intensities were compared and analyzed using `compare_lfqintensities.R`.
+
+All results are summarized and visualized in `afterprocessing4masterthesis.R`. 
+
+* single plots for each concentration
+* analysis and comparison using one and two peptides for post-processing
+* comparison number of human proteins
+* analysis and comaprison of different evaluation methods
+* comparison of MBR and no MBR
 
 ## Extracts
 
