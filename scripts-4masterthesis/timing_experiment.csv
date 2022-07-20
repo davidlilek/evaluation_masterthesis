@@ -1,0 +1,11 @@
+Evaluation method;UPS1 1 threads 15 samples;1thread ;UPS1 10 threads 15 samples;10threads;UPS1 30 threads 15 samples;30threads;UPS1 50 threads 15 samples
+MBR;24:32:53;1472,88;07:41:01;461,02;06:24:01;384,02;not possible
+MBR_pooled;24:50:59;1490,98;07:29:36;449,60;06:22:01;382,02;not possible
+MBR_pooled_oldversion;26:09:42;1569,70;07:34:50;454,83;06:29:03;389,05;not possible
+MBR_pooled_secondpeptides;29:36:28;1776,47;08:19:46;499,77;07:04:42;424,70;not possible
+noMBR;22:05:21;1325,35;04:24:51;264,85;03:34:35;214,58;not possible
+noMBR_pooled;21:58:02;1318,03;04:29:40;269,67;03:33:39;213,65;not possible
+noMBR_pooled_oldversion;22:31:39;1351,65;04:28:13;268,22;03:39:27;219,45;not possible
+noMBR_pooled_secondpeptides;26:48:43;1608,72;05:11:28;311,47;04:13:51;253,85;not possible
+;;;;;;;
+;;;;;;;
