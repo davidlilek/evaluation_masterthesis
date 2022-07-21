@@ -85,5 +85,12 @@ All results are summarized and visualized in `afterprocessing4masterthesis.R`. T
 This folder contains a collecation of different evaluations and useful commands that were used in the course of the master thesis.
 
 * `compare_fasta` was used to compare different download options for FASTA files of *Homo sapiens* and *Tribolium castaneum*
-* `download_ftp.py`
+* `download_ftp.py`: python script for downloading data from EMBL's European Bioinformatics Institute | was used during master thesis to download UPS1 data-set
+* `getinfofromuniprot.Rmd`: with demo data from sequence 20220609 `UniprotR` package was used to perform GO term analysis
+* `grep_proteinGroups.sh`: simple bash command to grep all proteinGroups.txt files from one project folder, renames and copies them to a pre-defined folder
+* `render_all_rmarkown.R`: short R code to render all Rmd files in a certain folder
+* `table_maxparameters_LaTeX.R`: code to genereate LaTeX tables from existing R dataframes
+* `timing_experiment.R`: evaluation of the timing experiment on the server where different number of threads were used for analysis in MaxQuant
+* `uplpoad_files_to_server.sh`: bash script with some examples how to use `scp`for up and/or downloading of files to the server
+  
 
