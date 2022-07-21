@@ -35,13 +35,13 @@ The results are summarized in 4 Rmd files.
 * `20220406_TR_QC_summary_rerun_twopeptide.Rmd`
 * `20220406_TR_QC_summary_seconpeptides_rerun_twopeptide.Rmd`
 
-In this files the results are sumarized and plots created and arranged for master thesis in file `afterprocessing4masterthesis.R`.
+In this files the results are sumarized and plots created (number of proteins and relative standard deviation) and arranged for master thesis in file `afterprocessing4masterthesis.R`.
 
 LFQ intensities were compared and analyzed using `compare_lfqintensities.R`.
 
 ## UPS1
 
-Contains one Rmd for each evaluation method as described above resulting in 8 Rmd files. `20220406_TR_QC` refers to the LC-MS/MS sequence name.
+Contains one Rmd for each evaluation method as described above resulting in 8 Rmd files. `20220406_TR_QC` refers to the name of the LC-MS/MS sequence.
 The results are summarized in 4 Rmd files.
 
 * `UPS1_summary_rerun_secondpeptides_onepeptide.Rmd`
@@ -53,18 +53,37 @@ In this files the results are sumarized and plots created.
 
 LFQ intensities were compared and analyzed using `compare_lfqintensities.R`.
 
-All results are summarized and visualized in `afterprocessing4masterthesis.R`. 
+All results are summarized and visualized in `afterprocessing4masterthesis.R`. The number of proteins and relative standard deviation was investigated.
 
-* single plots for each concentration
+* single plots for each concentration 
 * analysis and comparison using one and two peptides for post-processing
 * comparison number of human proteins
-* analysis and comaprison of different evaluation methods
+* analysis and comparison of different evaluation methods
 * comparison of MBR and no MBR
 
 ## Extracts
 
+Contains one Rmd for each evaluation method as described above resulting in 8 Rmd files. `20220406_TR_extracts` refers to the name of the LC-MS/MS sequence.
+The results are summarized in 4 Rmd files.
+
+* `20220406_TR_extracs_summary_rerun_onepeptide.Rmd`
+* `20220406_TR_extracts_summary_rerun_seconpeptides_onepeptide.Rmd`
+* `20220406_TR_extracts_summary_rerun_twopeptide.Rmd`
+* `20220406_TR_extracts_summary_seconpeptides_rerun_twopeptide.Rmd`
+
+In this files the results are sumarized and plots created and arranged for master thesis in file `afterprocessing4masterthesis.R`.
+
+All results are summarized and visualized in `afterprocessing4masterthesis.R`. The number of proteins and relative standard deviation was investigated.
+
+* single plots for each extract
+* analysis and comparison using one and two peptides for post-processing
+* analysis and comparison of different evaluation methods
+* comparison of MBR and no MBR
+
 ## scripts-4masterthesis
 
+This folder contains a collecation of different evaluations and useful commands that were used in the course of the master thesis.
 
-
+* `compare_fasta` was used to compare different download options for FASTA files of *Homo sapiens* and *Tribolium castaneum*
+* `download_ftp.py`
 
