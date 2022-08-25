@@ -101,7 +101,7 @@ lfq_2gether <- merge(lfq_2gether, onepeptide[[4]], all = TRUE, by = "group")
 lfq_2gether_vector <- unlist(lfq_2gether[,-1], use.names = FALSE)
 
 
-d# create variable names and value factors
+# create variable names and value factors
 
 name <- c(
   paste(rep("MBR\n",39*3),"pooled",sep=""),
